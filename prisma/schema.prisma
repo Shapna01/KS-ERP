@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model designations {
+  id              Int       @id @default(autoincrement())
+  name            String   
+  description     String
+  team_associated String
+  department      String
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+
+  users           users[]
+}
+
+model users {
+  id                 Int       @id @default(autoincrement())
+  password           String   @db.VarChar(255)
+  name               String   @db.VarChar(255)
+  designationId Int
+
+designation designations
+  @relation(fields: [designationId], references: [id])
+
+  team               String   @db.VarChar(255)
+  manager            String   @db.VarChar(255)
+  role               String   @db.VarChar(255)
+  phone              String   @db.VarChar(20)
+  joining_date       DateTime @db.Date
+  offer_letter       String
+  increment_document String
+  userid             String
+  workemail          String
+  personalemail      String
+  dob                DateTime @db.Date
+  gender             String
+  present_address    String
+  permanent_address  String
+  department         String
+  reporting_to       String
+  employment_type    String
+  aadhaar            String
+  pan                String
+  passport           String
+}

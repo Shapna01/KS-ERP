@@ -1,30 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function Home() {
+export default function LoginPage() {
 
   const router = useRouter();
 
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
     setError("");
 
-    if (email === "admin@kssmart.com") {
-      router.push("/create-password");
+    if (
+      email === "admin@kssmart.com" &&
+      password === "Admin@123"
+    ) {
+      router.push("/dashboard/users");
     } else {
-      setError("No account found. Contact your administrator.");
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <main className="h-screen w-full grid grid-cols-1 md:grid-cols-2 text-black">
+    <main className="h-screen w-full grid grid-cols-1 md:grid-cols-2">
 
       <div className="relative bg-gradient-to-br from-pink-100 via-purple-100 to-pink-50 p-16 flex flex-col justify-between overflow-hidden">
 
@@ -56,23 +61,19 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="bg-white flex items-center justify-center px-16">
+     <div className="bg-white flex items-center justify-center px-16">
 
         <div className="w-full max-w-md">
-
-          <div className="bg-green-100 border border-green-200 text-green-700 text-sm rounded-lg px-5 py-4 mb-10">
-            Password setup link sent to your work mail. Please check and proceed.
-          </div>
 
           <h2 className="text-5xl font-bold text-black">
             Welcome to KS ERP
           </h2>
 
           <p className="mt-4 text-gray-500 leading-8 text-lg">
-            Enter your work mail to continue. We'll check your access and guide you in.
+            Login to access your ERP dashboard.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          <form onSubmit={handleLogin} className="mt-10 space-y-6">
 
             <div>
               <label className="block text-sm text-gray-600 mb-2">
@@ -81,19 +82,35 @@ export default function Home() {
 
               <input
                 type="email"
-                placeholder="Ex: abc@kssmart.co"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-4 outline-none focus:ring-2 focus:ring-purple-600"
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-purple-700 hover:bg-purple-800 transition-all text-white py-4 rounded-lg font-medium text-lg"
-            >
-              Set Password
-            </button>
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">
+                Password
+              </label>
+
+              <input
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-4 outline-none focus:ring-2 focus:ring-purple-600"
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-purple-700 text-sm hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
 
             {
               error && (
@@ -102,6 +119,13 @@ export default function Home() {
                 </div>
               )
             }
+
+            <button
+              type="submit"
+              className="w-full bg-purple-700 hover:bg-purple-800 transition-all text-white py-4 rounded-lg font-medium text-lg"
+            >
+              Login
+            </button>
 
           </form>
         </div>

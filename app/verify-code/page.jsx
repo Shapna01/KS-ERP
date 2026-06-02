@@ -1,25 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function Home() {
+export default function VerifyCode() {
 
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleVerify = (e) => {
     e.preventDefault();
 
     setError("");
 
-    if (email === "admin@kssmart.com") {
+    if (code === "123456") {
       router.push("/create-password");
     } else {
-      setError("No account found. Contact your administrator.");
+      setError("Invalid verification code");
     }
   };
 
@@ -60,40 +60,29 @@ export default function Home() {
 
         <div className="w-full max-w-md">
 
-          <div className="bg-green-100 border border-green-200 text-green-700 text-sm rounded-lg px-5 py-4 mb-10">
-            Password setup link sent to your work mail. Please check and proceed.
-          </div>
-
           <h2 className="text-5xl font-bold text-black">
-            Welcome to KS ERP
+            Verify Code
           </h2>
 
           <p className="mt-4 text-gray-500 leading-8 text-lg">
-            Enter your work mail to continue. We'll check your access and guide you in.
+            Enter the 6-digit verification code sent to your work mail.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          <form onSubmit={handleVerify} className="mt-10 space-y-6">
 
             <div>
               <label className="block text-sm text-gray-600 mb-2">
-                Work mail
+                Verification Code
               </label>
 
               <input
-                type="email"
-                placeholder="Ex: abc@kssmart.co"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Enter code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-4 outline-none focus:ring-2 focus:ring-purple-600"
               />
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-purple-700 hover:bg-purple-800 transition-all text-white py-4 rounded-lg font-medium text-lg"
-            >
-              Set Password
-            </button>
 
             {
               error && (
@@ -102,6 +91,13 @@ export default function Home() {
                 </div>
               )
             }
+
+            <button
+              type="submit"
+              className="w-full bg-purple-700 hover:bg-purple-800 transition-all text-white py-4 rounded-lg font-medium text-lg"
+            >
+              Verify Code
+            </button>
 
           </form>
         </div>
