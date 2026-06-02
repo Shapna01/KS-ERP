@@ -30,9 +30,9 @@ export default function UserSidebar() {
   ];
 
   return (
-    <div className="w-[250px] bg-white border-r border-[#EAECF0]">
+    <div className="fixed top-[72px] left-[74px] w-[250px] h-[calc(100vh-72px)] bg-white border-r border-[#EAECF0] overflow-y-auto">
       <div className="px-8 py-7 border-b">
-        <h1 className="text-[24px] font-semibold">
+        <h1 className="text-[24px] text-black font-semibold">
           Users
         </h1>
       </div>

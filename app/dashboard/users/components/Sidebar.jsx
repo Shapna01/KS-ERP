@@ -56,7 +56,7 @@ export default function Sidebar() {
 
   return (
 
-    <div className="w-[74px] min-h-screen bg-gradient-to-b from-[#4B0055] to-[#7A008C] flex flex-col items-center">
+    <div className="fixed left-0 top-0 w-[74px] h-screen bg-gradient-to-b from-[#4B0055] to-[#7A008C] flex flex-col items-center z-50">
 
       <div className="w-full h-[72px] border-b border-purple-800 flex items-center justify-center">
 

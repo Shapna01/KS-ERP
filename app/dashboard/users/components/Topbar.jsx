@@ -11,19 +11,19 @@ import {
 
 export default function Topbar() {
   return (
-    <div className="h-[72px] bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <div className="fixed top-0 left-[74px] right-0 z-50 h-[72px] bg-white border-b border-gray-200 flex items-center justify-between px-6">
       
       <div className="relative w-[420px]">
 
         <Search
           size={18}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-800"
         />
 
         <input
           type="text"
           placeholder="Search"
-          className="w-full h-[42px] rounded-xl border border-gray-200 bg-[#FAFAFC] pl-11 pr-4 text-sm outline-none focus:border-purple-500"
+          className="w-full h-[42px] rounded-xl border border-gray-300 bg-[#FAFAFC] pl-11 pr-4 text-sm outline-none focus:border-purple-500 " 
         />
 
       </div>

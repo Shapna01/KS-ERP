@@ -90,14 +90,14 @@ const prevPage = () => {
     <div className="flex h-screen overflow-hidden bg-[#F8F8FA]">
       <Sidebar />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden ml-[74px]">
         <Topbar />
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden pt-[72px]">
 
-<UserSidebar />
+          <UserSidebar />
 
-          <div className="flex-1 overflow-auto bg-white px-8 py-7">
+          <div className="flex-1 overflow-y-auto  px-8 py-7 ml-[280px]">
             <div className="flex items-center gap-2 mb-7 text-[13px]">
               <span className="text-[#C11574] font-medium">Users</span>
 
