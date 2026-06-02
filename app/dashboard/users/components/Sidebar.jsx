@@ -60,18 +60,11 @@ export default function Sidebar() {
 
       <div className="w-full h-[72px] border-b border-purple-800 flex items-center justify-center">
 
-        <div className="relative w-10 h-10">
-
-          <div className="absolute w-4 h-4 bg-pink-500 rotate-45 left-0 top-1 rounded-sm"></div>
-
-          <div className="absolute w-4 h-4 bg-cyan-400 rotate-45 right-0 top-1 rounded-sm"></div>
-
-          <div className="absolute w-4 h-4 bg-fuchsia-600 rotate-45 left-0 bottom-1 rounded-sm"></div>
-
-          <div className="absolute w-4 h-4 bg-blue-500 rotate-45 right-0 bottom-1 rounded-sm"></div>
-
-        </div>
-
+        <img
+  src="/images/front.png"
+  alt="logo"
+  className="w-13 h-13 object-contain"
+/>
       </div>
 
       <div className="flex flex-col items-center gap-5 mt-6">
