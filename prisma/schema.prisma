@@ -64,8 +64,6 @@ model Approval {
   createdAt   DateTime @default(now())
 }
 
-
-
 model Project {
   id                 Int      @id @default(autoincrement())
   projectName        String
@@ -77,4 +75,53 @@ model Project {
   teamSize           Int
   projectStatus      String
   createdAt          DateTime @default(now())
+}
+
+model PurchaseRequest {
+  id               Int      @id @default(autoincrement())
+  prNumber         String   @unique
+  projectNumber    String
+  department       String
+  category         String
+  priority         String
+  requestType      String
+  deliveryAddress  String?
+  notes            String?
+  status           String
+  items            PurchaseRequestItem[]
+  rfqs             RFQ[]
+}
+
+model PurchaseRequestItem {
+  id                Int      @id @default(autoincrement())
+  purchaseRequestId Int
+  itemName          String
+  itemCode          String
+  quantity          Int
+  estimatedRate     Float
+  unit              String
+  remarks           String?
+
+  purchaseRequest PurchaseRequest
+    @relation(fields:[purchaseRequestId], references:[id])
+}
+
+model Vendor {
+  id          Int      @id @default(autoincrement())
+  vendorName  String
+  contactNo   String
+  email       String
+  gstNo       String?
+  address     String?
+}
+
+model RFQ {
+  id                Int      @id @default(autoincrement())
+  rfqNumber         String   @unique
+  purchaseRequestId Int
+  dueDate           DateTime
+  status            String
+
+  purchaseRequest PurchaseRequest
+    @relation(fields:[purchaseRequestId], references:[id])
 }
