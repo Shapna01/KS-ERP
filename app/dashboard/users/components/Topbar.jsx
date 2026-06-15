@@ -14,7 +14,6 @@ export default function Topbar() {
     <div className="fixed top-0 left-[74px] right-0 z-50 h-[72px] bg-white border-b border-gray-200 flex items-center justify-between px-6">
       
       <div className="relative w-[420px]">
-
         <Search
           size={18}
           className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-800"

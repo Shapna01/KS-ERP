@@ -97,7 +97,7 @@ const prevPage = () => {
 
           <UserSidebar />
 
-          <div className="flex-1 overflow-y-auto  px-8 py-7 ml-[280px]">
+          <div className="flex-1 overflow-y-auto  px-8 py-7 ml-[250px]">
             <div className="flex items-center gap-2 mb-7 text-[13px]">
               <span className="text-[#C11574] font-medium">Users</span>
 
@@ -108,7 +108,7 @@ const prevPage = () => {
 
             <div className="flex items-start justify-between mb-8">
               <div>
-                <h1 className="text-[30px] font-semibold text-[#101828] mb-3">
+                <h1 className="text-purple-800 text-[30px] font-semibold text-[#101828] mb-3">
                   Designations
                 </h1>
 

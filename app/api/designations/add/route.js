@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
 export async function POST(req) {
   try {
     const body = await req.json();
+
+    console.log("BODY:", body);
 
     const designation = await prisma.designations.create({
       data: {
@@ -11,6 +10,7 @@ export async function POST(req) {
         description: body.description || null,
         team_associated: body.team || null,
         department: body.department || null,
+        department_head: body.department_head || null,
       },
     });
 
@@ -18,7 +18,6 @@ export async function POST(req) {
       success: true,
       data: designation,
     });
-
   } catch (error) {
     console.log(error);
 
@@ -27,9 +26,7 @@ export async function POST(req) {
         success: false,
         error: error.message,
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }

@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
     const users = await prisma.users.findMany({
+      include: {
+        designation: true,
+      },
       orderBy: {
         id: "asc",
       },
@@ -11,10 +14,10 @@ export async function GET() {
 
     return NextResponse.json(users);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return NextResponse.json(
-      { error: "Database error" },
+      { error: error.message },
       { status: 500 }
     );
   }

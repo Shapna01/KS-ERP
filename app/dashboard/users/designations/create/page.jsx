@@ -143,14 +143,14 @@ export default function CreateDesignationPage() {
                           </label>
 
                   <input
-  type="text"
-  name="name"
-  required
-  value={formData.name}
-  onChange={handleChange}
-  placeholder="Procurement Team"
-  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
-/>
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Procurement Team"
+                  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
+                   />
 
                 </div>
 
@@ -165,12 +165,12 @@ export default function CreateDesignationPage() {
                   <div className="relative">
 
                     <select
-  name="department"
-  required
-  value={formData.department}
-  onChange={handleChange}
-  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] appearance-none outline-none focus:border-[#7F56D9]"
->
+                    name="department"
+                    required
+                    value={formData.department}
+                    onChange={handleChange}
+                    className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] appearance-none outline-none focus:border-[#7F56D9]"
+                     >
 
                       <option value="">
                         Select Department
@@ -204,18 +204,18 @@ export default function CreateDesignationPage() {
               <div className="mb-5">
 
                 <label className="block text-[13px] text-[#344054] mb-2">
-  Designation Description
-  <span className="text-red-500"> *</span>
-</label>
+                Designation Description
+                <span className="text-red-500"> *</span>
+                </label>
 
                 <textarea
-  name="description"
-  required
-  value={formData.description}
-  onChange={handleChange}
-  placeholder="Handle purchasing and vendor management activities."
-  className="w-full h-[90px] border border-[#D0D5DD] rounded-[8px] px-4 py-3 text-[14px] resize-none outline-none focus:border-[#7F56D9]"
-/>
+                name="description"
+                required
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Handle purchasing and vendor management activities."
+                className="w-full h-[90px] border border-[#D0D5DD] rounded-[8px] px-4 py-3 text-[14px] resize-none outline-none focus:border-[#7F56D9]"
+                 />
 
               </div>
 
@@ -229,14 +229,14 @@ export default function CreateDesignationPage() {
                   </label>
 
                   <input
-  type="text"
-  name="team"
-  required
-  value={formData.team}
-  onChange={handleChange}
-  placeholder="Procurement Team"
-  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
-/>
+                  type="text"
+                  name="team"
+                  required
+                  value={formData.team}
+                  onChange={handleChange}
+                  placeholder="Procurement Team"
+                  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
+                   />
 
                 </div>
 
@@ -249,14 +249,14 @@ export default function CreateDesignationPage() {
                   </label>
 
                   <input
-  type="text"
-  name="department_head"
-  required
-  value={formData.department_head}
-  onChange={handleChange}
-  placeholder="014-Niranjan"
-  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
-/>
+                  type="text"
+                  name="department_head"
+                  required
+                  value={formData.department_head}
+                  onChange={handleChange}
+                  placeholder="014-Niranjan"
+                  className="w-full h-[44px] border border-[#D0D5DD] rounded-[8px] px-4 text-[14px] outline-none focus:border-[#7F56D9]"
+                   />
 
                 </div>
 
@@ -317,7 +317,7 @@ export default function CreateDesignationPage() {
             </div>
 
           </div>
-</div>
+          </div>
         </div>
 
       </div>

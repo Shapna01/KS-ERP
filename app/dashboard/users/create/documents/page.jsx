@@ -136,38 +136,34 @@ export default function SupportingDocumentsPage() {
 
             <div className="bg-white border rounded-xl p-1 flex mb-5">
               <button
-  onClick={() =>
-    router.push("/dashboard/users/create/general")
-  }
-  className="flex-1"
->
-  <Step label="General Details" />
-</button>
-
-<button
-  onClick={() =>
-    router.push("/dashboard/users/create/official")
-  }
-  className="flex-1"
->
-  <Step label="Official Details" />
-</button>
-
-<button
-  onClick={() =>
-    router.push("/dashboard/users/create/identifications")
-  }
-  className="flex-1"
->
-  <Step label="Identifications" />
-</button>
-
-<div className="flex-1">
-  <Step label="Documents" active />
-</div>
-            </div>
-
-            <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+              onClick={() =>
+                router.push("/dashboard/users/create/general")
+              }
+              className="flex-1"
+              >
+                <Step label="General Details" />
+                </button>
+                <button
+                onClick={() =>
+                  router.push("/dashboard/users/create/official")
+                }
+                className="flex-1"
+                >
+                  <Step label="Official Details" />
+                  </button>
+                  <button
+                  onClick={() =>
+                    router.push("/dashboard/users/create/identifications")
+                  }
+                  className="flex-1"
+                  >
+                    <Step label="Identifications" />
+                    </button>
+                    <div className="flex-1">
+                      <Step label="Documents" active />
+                      </div>
+                      </div>
+                      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
 
               <div className="px-5 py-4 border-b">
                 <h2 className="font-semibold text-sm">
@@ -181,33 +177,33 @@ export default function SupportingDocumentsPage() {
               <div className="p-6 space-y-6">
 
                 <DocumentUpload
-  title="Offer Letter"
-  description="Upload employee offer letter"
-  file={files.offerLetter}
-  error={errors.offerLetter}
-  onChange={(e) => handleFile(e, "offerLetter")}
-  onRemove={() =>
-    setFiles((prev) => ({
-      ...prev,
-      offerLetter: null,
-    }))
-  }
-/>
+                title="Offer Letter"
+                description="Upload employee offer letter"
+                file={files.offerLetter}
+                error={errors.offerLetter}
+                onChange={(e) => handleFile(e, "offerLetter")}
+                onRemove={() =>
+                  setFiles((prev) => ({
+                    ...prev,
+                    offerLetter: null,
+                  }))
+                  }
+                  />
 
                 <DocumentUpload
-  title="Increment Document"
-  description="Upload salary revision document"
-  file={files.incrementDocument}
-  onChange={(e) =>
-    handleFile(e, "incrementDocument")
-  }
-  onRemove={() =>
-    setFiles((prev) => ({
-      ...prev,
-      incrementDocument: null,
-    }))
-  }
-/>
+                title="Increment Document"
+                description="Upload salary revision document"
+                file={files.incrementDocument}
+                onChange={(e) =>
+                handleFile(e, "incrementDocument")
+              }
+              onRemove={() =>
+                setFiles((prev) => ({
+                  ...prev,
+                  incrementDocument: null,
+                }))
+                }
+                />
               </div>
 
               <div className="border-t px-5 py-4 flex justify-between">

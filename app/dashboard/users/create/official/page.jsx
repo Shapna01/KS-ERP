@@ -138,33 +138,29 @@ export default function OfficialDetailsPage() {
             <div className="bg-white border border-[#E5E7EB] rounded-[8px] p-[3px] flex mb-5">
 
               <button
-  onClick={() =>
-    router.push("/dashboard/users/create/general")
-  }
-  className="flex-1 h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]"
->
-  1. General Details
-</button>
+              onClick={() =>
+                router.push("/dashboard/users/create/general")
+              }
+              className="flex-1 h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]"
+              >
+                1. General Details
+                </button>
 
               <div className="flex-1 h-[34px] rounded-[6px] bg-[#FCE7F3] text-[#C026D3] font-medium flex items-center justify-center text-[11px]">
                 2. Official Details
               </div>
 
               <button
-  onClick={() => {
-    const officialData =
-      localStorage.getItem("officialDetails");
-
-    if (officialData) {
-      router.push(
-        "/dashboard/users/create/identifications"
-      );
-    }
-  }}
-  className="flex-1 h-[34px] flex items-center justify-center text-[11px]"
->
-  3. Identifications
-</button>
+              onClick={() => {
+                const officialData =
+                localStorage.getItem("officialDetails");
+                if (officialData) {
+                  router.push("/dashboard/users/create/identifications");
+                }
+              }}
+              className="flex-1 h-[34px] flex items-center justify-center text-[11px]">
+                3. Identifications
+                </button>
 
               <div className="flex-1 h-[34px] flex items-center justify-center text-[11px] text-[#6B7280]">
                 4. Supporting Documents
@@ -191,22 +187,21 @@ export default function OfficialDetailsPage() {
                 <div className="max-w-[560px] mx-auto space-y-4">
 
                   <FormField label="Date of Join" required>
-  <div>
-    <input
-      type="date"
-      name="joining_date"
-      value={formData.joining_date}
-      onChange={handleChange}
-      className={inputClass}
-    />
-
-    {errors.joining_date && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.joining_date}
-      </p>
-    )}
-  </div>
-</FormField>
+                    <div>
+                      <input
+                      type="date"
+                      name="joining_date"
+                      value={formData.joining_date}
+                      onChange={handleChange}
+                      className={inputClass}
+                      />
+                      {errors.joining_date && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {errors.joining_date}
+                          </p>
+                        )}
+                        </div>
+                        </FormField>
 
                   <FormField
                     label="Designation"
@@ -225,10 +220,10 @@ export default function OfficialDetailsPage() {
                       <option>Manager</option>
                     </select>
                     {errors.designation && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.designation}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.designation}
+                        </p>
+                      )}
                   </FormField>
 
                   <FormField
@@ -247,10 +242,10 @@ export default function OfficialDetailsPage() {
                       <option>Backend Team</option>
                     </select>
                     {errors.team && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.team}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.team}
+                        </p>
+                      )}
                   </FormField>
 
                   <FormField
@@ -269,10 +264,10 @@ export default function OfficialDetailsPage() {
                       <option>Management</option>
                     </select>
                     {errors.department && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.department}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.department}
+                        </p>
+                      )}
                   </FormField>
 
                   <FormField
@@ -290,10 +285,10 @@ export default function OfficialDetailsPage() {
                       <option>Saranya Kumar</option>
                     </select>
                     {errors.reporting_to && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.reporting_to}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.reporting_to}
+                        </p>
+                      )}
                   </FormField>
 
                   <FormField
@@ -312,10 +307,10 @@ export default function OfficialDetailsPage() {
                       <option>Contract</option>
                     </select>
                     {errors.employment_type && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.employment_type}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.employment_type}
+                        </p>
+                      )}
                   </FormField>
 
                   <div className="border-t border-[#F1F1F1] my-5"></div>

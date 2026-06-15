@@ -130,47 +130,45 @@ export default function GeneralDetailsPage() {
             </div>
 
             <div className="bg-white border border-[#E5E7EB] rounded-[8px] p-[3px] flex mb-5">
+              <button className="flex-1">
+                <div className="h-[34px] rounded-[6px] bg-[#FCE7F3] text-[#C026D3] font-medium flex items-center justify-center text-[11px]">
+                  1. General Details
+                  </div>
+                  </button>
+                  <button
+                  className="flex-1"
+                  onClick={() =>
+                    router.push("/dashboard/users/create/official")
+                  }
+                  >
+                <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
+                  2. Official Details
+                  </div>
+                  </button>
 
-  <button className="flex-1">
-    <div className="h-[34px] rounded-[6px] bg-[#FCE7F3] text-[#C026D3] font-medium flex items-center justify-center text-[11px]">
-      1. General Details
-    </div>
-  </button>
+                  <button
+                  className="flex-1"
+                  onClick={() =>
+                  router.push("/dashboard/users/create/identifications")
+                  }
+                  >
+                <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
+                 3. Identifications
+                 </div>
+                 </button>
 
-  <button
-    className="flex-1"
-    onClick={() =>
-      router.push("/dashboard/users/create/official")
-    }
-  >
-    <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
-      2. Official Details
-    </div>
-  </button>
+                 <button
+                 className="flex-1"
+                 onClick={() =>
+                 router.push("/dashboard/users/create/documents")
+                 }
+                 >
+                <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
+                 4. Supporting Documents
+                 </div>
+                 </button>
 
-  <button
-    className="flex-1"
-    onClick={() =>
-      router.push("/dashboard/users/create/identifications")
-    }
-  >
-    <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
-      3. Identifications
-    </div>
-  </button>
-
-  <button
-    className="flex-1"
-    onClick={() =>
-      router.push("/dashboard/users/create/documents")
-    }
-  >
-    <div className="h-[34px] flex items-center justify-center text-[11px] text-[#6B7280] hover:text-[#C026D3]">
-      4. Supporting Documents
-    </div>
-  </button>
-
-</div>
+                 </div>
 
             <div className="bg-white border border-[#E5E5E5] rounded-[8px] overflow-hidden">
 
@@ -199,58 +197,58 @@ export default function GeneralDetailsPage() {
                 <div className="max-w-[560px] mx-auto space-y-4">
 
                   <FormField label="Name">
-  <div>
-    <input
-      type="text"
-      name="name"
-      value={formData.name}
-      onChange={handleChange}
-      className={inputClass}
-    />
+                    <div>
+                      <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className={inputClass}
+                      />
 
-    {errors.name && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.name}
-      </p>
-    )}
-  </div>
-</FormField>
+                    {errors.name && (
+                      <p className="text-red-500 text-[10px] mt-1">
+                    {errors.name}
+                    </p>
+                      )}
+                    </div>
+                    </FormField>
 
                   <FormField label="User ID">
-  <div>
-    <input
-      type="text"
-      name="userid"
-      value={formData.userid}
-      onChange={handleChange}
-      className={inputClass}
-    />
+                    <div>
+                      <input
+                      type="text"
+                      name="userid"
+                      value={formData.userid}
+                      onChange={handleChange}
+                      className={inputClass}
+                      />
 
-    {errors.userid && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.userid}
-      </p>
-    )}
-  </div>
-</FormField>
+                  {errors.userid && (
+                    <p className="text-red-500 text-[10px] mt-1">
+                  {errors.userid}
+                  </p>
+                   )}
+                  </div>
+                  </FormField>
 
                   <FormField label="Work Email">
-  <div>
-    <input
-      type="email"
-      name="workemail"
-      value={formData.workemail}
-      onChange={handleChange}
-      className={inputClass}
-    />
+                    <div>
+                      <input
+                      type="email"
+                      name="workemail"
+                      value={formData.workemail}
+                      onChange={handleChange}
+                      className={inputClass}
+                      />
 
-    {errors.workemail && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.workemail}
-      </p>
-    )}
-  </div>
-</FormField>
+                      {errors.workemail && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                      {errors.workemail}
+                      </p>
+                      )}
+                    </div>
+                   </FormField>
 
                   <FormField label="Personal Email">
                     <input
@@ -259,12 +257,12 @@ export default function GeneralDetailsPage() {
                       value={formData.personalemail}
                       onChange={handleChange}
                       className={inputClass}
-                    />
-                    {errors.personalemail && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.personalemail}
-  </p>
-)}
+                      />
+                      {errors.personalemail && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                      {errors.personalemail}
+                      </p>
+                      )}
                   </FormField>
 
                   <FormField label="Phone">
@@ -281,10 +279,10 @@ export default function GeneralDetailsPage() {
                         className={inputClass}
                       />
                       {errors.phone && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.phone}
-  </p>
-)}
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {errors.phone}
+                          </p>
+                        )}
                     </div>
                   </FormField>
 
@@ -299,10 +297,10 @@ export default function GeneralDetailsPage() {
                       className={inputClass}
                     />
                     {errors.dob && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.dob}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.dob}
+                        </p>
+                      )}
                   </FormField>
 
                   <FormField label="Gender">
@@ -328,10 +326,10 @@ export default function GeneralDetailsPage() {
                       className={`${inputClass} h-auto py-2 resize-none`}
                     />
                     {errors.presentAddress && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.presentAddress}
-  </p>
-)}  
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.presentAddress}
+                        </p>
+                      )}  
                   </FormField>
 
                   <FormField label="Permanent Address">
@@ -343,10 +341,9 @@ export default function GeneralDetailsPage() {
                       className={`${inputClass} h-auto py-2 resize-none`}
                     />
                     {errors.permanentAddress && (
-  <p className="text-red-500 text-[10px] mt-1">
-    {errors.permanentAddress}
-  </p>
-)}
+                      <p className="text-red-500 text-[10px] mt-1">
+                        {errors.permanentAddress}</p>
+                      )}
                   </FormField>
 
                   <FormField label="Role">

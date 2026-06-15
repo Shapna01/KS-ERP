@@ -51,8 +51,14 @@ export default function UsersPage() {
 
         const data = await response.json();
 
-        setUsers(data);
-        setFilteredUsers(data);
+if (Array.isArray(data)) {
+  setUsers(data);
+  setFilteredUsers(data);
+} else {
+  console.error("API Error:", data);
+  setUsers([]);
+  setFilteredUsers([]);
+}
 
       } catch (error) {
 
@@ -71,19 +77,20 @@ export default function UsersPage() {
 
   useEffect(() => {
 
-    const filtered = users.filter((user) => {
-
+    const filtered = Array.isArray(users)
+  ? users.filter((user) => {
       const search = searchTerm.toLowerCase();
 
       return (
-        user.name?.toLowerCase().includes(search) ||
-        user.designation?.toLowerCase().includes(search) ||
-        user.team?.toLowerCase().includes(search) ||
-        user.workemail?.toLowerCase().includes(search) ||
-        user.role?.toLowerCase().includes(search) ||
-        user.reporting_to?.toLowerCase().includes(search)
-      );
-    });
+  user.name?.toLowerCase().includes(search) ||
+  user.designation?.name?.toLowerCase().includes(search) ||
+  user.team?.toLowerCase().includes(search) ||
+  user.workemail?.toLowerCase().includes(search) ||
+  user.role?.toLowerCase().includes(search) ||
+  user.reporting_to?.toLowerCase().includes(search)
+);
+    })
+  : [];
 
     setFilteredUsers(filtered);
     setCurrentPage(1);
@@ -150,11 +157,9 @@ const indexOfLastItem =
 const indexOfFirstItem =
   indexOfLastItem - itemsPerPage;
 
-const currentUsers =
-  filteredUsers.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+const currentUsers = Array.isArray(filteredUsers)
+  ? filteredUsers.slice(indexOfFirstItem, indexOfLastItem)
+  : [];
 
 const nextPage = () => {
   if (currentPage < totalPages) {
@@ -196,7 +201,7 @@ const prevPage = () => {
                 </span>
 
                 <ChevronRight
-                  size={15}
+                  size={15} 
                   className="text-[#98A2B3]"
                 />
 
@@ -211,7 +216,7 @@ const prevPage = () => {
 
                 <div>
 
-                  <h1 className="text-[36px] font-semibold tracking-[-0.5px] text-[#18181B] mb-2">
+                  <h1 className="text-purple-800 text-[30px] font-semibold tracking-[-0.5px] text-[#18181B] mb-2">
                     Employee List
                   </h1>
 
@@ -234,7 +239,7 @@ const prevPage = () => {
                       + Add New
                     </button>
 
-                  </Link>
+                  </Link> 
 
                 </div>
 
@@ -242,7 +247,7 @@ const prevPage = () => {
 
               <div className="flex items-center justify-between mb-5">
 
-                <h2 className="text-[28px] font-semibold">
+                <h2 className="text-[25px] font-semibold">
                   Employee Details ({filteredUsers.length})
                 </h2>
 
@@ -341,7 +346,8 @@ const prevPage = () => {
                       <div>
 
                         <p className="font-medium text-[14px]">
-                          {user.designation || "-"}
+                            {user.designation?.name || "-"}
+
                         </p>
 
                         <p className="text-sm text-[#98A2B3]">
@@ -385,72 +391,61 @@ const prevPage = () => {
               </div>
 
               <div className="flex items-center justify-between mt-6">
+                <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <span>Showing:</span>
+                  <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="border rounded-lg px-3 py-2 bg-white"
+                  >
+                    <option value={5}>05</option>
+                    <option value={7}>07</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    </select>
+                    <span>
+                      of {filteredUsers.length} item
+                      </span>
+                      </div>
+                      {totalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                          <button
+                          onClick={prevPage}
+                          disabled={currentPage === 1}
+                          className="w-10 h-10 rounded-lg border bg-white flex items-center justify-center"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+                          {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                          ).map((page) => (
+                          <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-10 h-10 rounded-lg ${
+                             currentPage === page
+                               ? "bg-purple-700 text-white"
+                               : "border bg-white"}`}
+                          >
+                            {page}
+                          </button>
+                          ))}
 
-  <div className="flex items-center gap-3 text-sm text-gray-500">
+                          <button
+                          onClick={nextPage}
+                          disabled={currentPage === totalPages}
+                          className="w-10 h-10 rounded-lg border bg-white flex items-center justify-center"
+                          >
+                            <ChevronRight size={16} />
+                          </button>
 
-    <span>Showing:</span>
-
-    <select
-      value={itemsPerPage}
-      onChange={(e) => {
-        setItemsPerPage(Number(e.target.value));
-        setCurrentPage(1);
-      }}
-      className="border rounded-lg px-3 py-2 bg-white"
-    >
-      <option value={5}>05</option>
-      <option value={7}>07</option>
-      <option value={10}>10</option>
-      <option value={20}>20</option>
-    </select>
-
-    <span>
-      of {filteredUsers.length} item
-    </span>
-
-  </div>
-
-  {totalPages > 1 && (
-    <div className="flex items-center gap-2">
-
-      <button
-        onClick={prevPage}
-        disabled={currentPage === 1}
-        className="w-10 h-10 rounded-lg border bg-white flex items-center justify-center"
-      >
-        <ChevronLeft size={16} />
-      </button>
-
-      {Array.from(
-        { length: totalPages },
-        (_, i) => i + 1
-      ).map((page) => (
-        <button
-          key={page}
-          onClick={() => setCurrentPage(page)}
-          className={`w-10 h-10 rounded-lg ${
-            currentPage === page
-              ? "bg-purple-700 text-white"
-              : "border bg-white"
-          }`}
-        >
-          {page}
-        </button>
-      ))}
-
-      <button
-        onClick={nextPage}
-        disabled={currentPage === totalPages}
-        className="w-10 h-10 rounded-lg border bg-white flex items-center justify-center"
-      >
-        <ChevronRight size={16} />
-      </button>
-
-    </div>
-  )}
-
-</div>
-
+                          </div>
+                        )}
+                        </div>
             </div>
           </div>
         </div>

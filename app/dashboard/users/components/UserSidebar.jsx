@@ -28,7 +28,7 @@ export default function UserSidebar() {
       path: "/dashboard/users/designations",
     },
   ];
-
+  
   return (
     <div className="fixed top-[72px] left-[74px] w-[250px] h-[calc(100vh-72px)] bg-white border-r border-[#EAECF0] overflow-y-auto">
       <div className="px-8 py-7 border-b">

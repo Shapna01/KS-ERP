@@ -4,10 +4,14 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const designations = await prisma.designations.findMany({
-      orderBy: {
-        id: "desc",
-      },
-    });
+  select: {
+    id: true,
+    name: true,
+  },
+  orderBy: {
+    id: "desc",
+  },
+});
 
     return NextResponse.json(designations);
 

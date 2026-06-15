@@ -13,6 +13,10 @@ import {
   BadgeHelp,
   FileText,
   Search,
+  ShieldCheck,
+  FolderKanban,
+  CheckSquare,
+
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -24,18 +28,23 @@ export default function Sidebar() {
       icon: <LayoutGrid size={18} />,
       path: "/dashboard",
     },
+    
     {
       icon: <Users size={18} />,
       path: "/dashboard/users",
     },
     {
-      icon: <GitBranch size={18} />,
-      path: "/dashboard/organisation",
-    },
+  icon: <FolderKanban size={18} />,
+  path: "/dashboard/projects",
+},
     {
       icon: <Boxes size={18} />,
       path: "/dashboard/team",
     },
+    {
+  icon: <ShieldCheck size={18} />,
+  path: "/dashboard/roles-permissions",
+},
     {
       icon: <Briefcase size={18} />,
       path: "/dashboard/department",
@@ -52,6 +61,10 @@ export default function Sidebar() {
       icon: <Search size={18} />,
       path: "/dashboard/search",
     },
+    {
+  icon: <CheckSquare size={18} />,
+  path: "/dashboard/approvals",
+},
   ];
 
   return (
@@ -61,10 +74,10 @@ export default function Sidebar() {
       <div className="w-full h-[72px] border-b border-purple-800 flex items-center justify-center">
 
         <img
-  src="/images/front.png"
-  alt="logo"
-  className="w-13 h-13 object-contain"
-/>
+        src="/images/front.png"
+        alt="logo"
+        className="w-13 h-13 object-contain"
+        />
       </div>
 
       <div className="flex flex-col items-center gap-5 mt-6">
@@ -83,15 +96,7 @@ export default function Sidebar() {
             >
 
               <div
-                className={`
-                  w-11
-                  h-11
-                  rounded-xl
-                  flex
-                  items-center
-                  justify-center
-                  cursor-pointer
-                  transition-all
+                className={`w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-all
                   ${
                     isActive
                       ? "bg-fuchsia-600 text-white shadow-lg"

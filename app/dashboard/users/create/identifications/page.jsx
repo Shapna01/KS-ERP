@@ -79,46 +79,39 @@ export default function IdentificationsPage() {
             </div>
 
             <div className="bg-white border rounded-xl p-1 flex mb-5">
-
-  <button
-    onClick={() =>
-      router.push("/dashboard/users/create/general")
-    }
-    className="flex-1 h-[40px] text-xs text-gray-500"
-  >
-    1. General
-  </button>
-
-  <button
-    onClick={() =>
-      router.push("/dashboard/users/create/official")
-    }
-    className="flex-1 h-[40px] text-xs text-gray-500"
-  >
-    2. Official
-  </button>
-
-  <div className="flex-1 h-[40px] bg-[#FCE7F3] text-[#C026D3] font-medium flex items-center justify-center text-xs rounded-lg">
-    3. Identity
-  </div>
-
-  <button
-    onClick={() => {
-      const data =
-        localStorage.getItem("identifications");
-
-      if (data) {
-        router.push(
-          "/dashboard/users/create/documents"
-        );
-      }
-    }}
-    className="flex-1 h-[40px] text-xs text-gray-500"
-  >
-    4. Docs
-  </button>
-
-</div>
+              <button
+              onClick={() =>
+                router.push("/dashboard/users/create/general")
+              }
+              className="flex-1 h-[40px] text-xs text-gray-500"
+              >
+                1. General
+                </button>
+                <button
+                onClick={() =>
+                  router.push("/dashboard/users/create/official")
+                }
+                className="flex-1 h-[40px] text-xs text-gray-500"
+                >
+                  2. Official
+                </button>
+                <div className="flex-1 h-[40px] bg-[#FCE7F3] text-[#C026D3] font-medium flex items-center justify-center text-xs rounded-lg">
+                  3. Identity
+                </div>
+                <button
+                onClick={() => {
+                  const data =
+                  localStorage.getItem("identifications");
+                  
+                  if (data) {
+                    router.push("/dashboard/users/create/documents");
+                  }
+                }}
+                className="flex-1 h-[40px] text-xs text-gray-500"
+                >
+                  4. Docs
+                </button>
+                </div>
 
             <div className="bg-white border rounded-xl shadow-sm">
 
@@ -132,48 +125,45 @@ export default function IdentificationsPage() {
               <div className="p-6 space-y-5">
 
                 <div className="grid grid-cols-[120px_1fr] items-start gap-4">
-  <label className="text-xs text-gray-600">
-    Aadhaar *
-  </label>
+                  <label className="text-xs text-gray-600">
+                    Aadhaar *
+                    </label>
+                    <div>
+                      <input
+                      type="text"
+                      name="aadhaar"
+                      value={formData.aadhaar}
+                      onChange={handleChange}
+                      className="h-[36px] w-full border rounded-md px-3 text-xs outline-none"
+                      />
+                      
+                      {errors.aadhaar && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {errors.aadhaar}
+                          </p>
+                        )}
+                        </div>
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-start gap-4">
+                          <label className="text-xs text-gray-600">
+                            PAN *
+                            </label>
+                            <div>
+                              <input
+                              type="text"
+                              name="pan"
+                              value={formData.pan}
+                              onChange={handleChange}
+                              className="h-[36px] w-full border rounded-md px-3 text-xs outline-none"
+                                />
 
-  <div>
-    <input
-      type="text"
-      name="aadhaar"
-      value={formData.aadhaar}
-      onChange={handleChange}
-      className="h-[36px] w-full border rounded-md px-3 text-xs outline-none"
-    />
-
-    {errors.aadhaar && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.aadhaar}
-      </p>
-    )}
-  </div>
-</div>
-
-                <div className="grid grid-cols-[120px_1fr] items-start gap-4">
-  <label className="text-xs text-gray-600">
-    PAN *
-  </label>
-
-  <div>
-    <input
-      type="text"
-      name="pan"
-      value={formData.pan}
-      onChange={handleChange}
-      className="h-[36px] w-full border rounded-md px-3 text-xs outline-none"
-    />
-
-    {errors.pan && (
-      <p className="text-red-500 text-[10px] mt-1">
-        {errors.pan}
-      </p>
-    )}
-  </div>
-</div>
+                              {errors.pan && (
+                                <p className="text-red-500 text-[10px] mt-1">
+                                {errors.pan}
+                                </p>
+                                 )}
+                              </div>
+                         </div>
 
                 <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                   <label className="text-xs text-gray-600">

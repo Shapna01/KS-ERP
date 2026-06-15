@@ -6,60 +6,47 @@ export async function POST(req) {
     const body = await req.json();
 
     const user = await prisma.users.create({
-      data: {
-        name: body.name || null,
-        userid: body.userid || null,
-        workemail: body.workemail || null,
-        personalemail: body.personalemail || null,
-        phone: body.phone || null,
+  data: {
+    name: body.name || null,
 
-        dob: body.dob
-          ? new Date(body.dob)
-          : null,
+    password: body.password || "123456",
 
-        gender: body.gender || null,
+    userid: body.userid || null,
+    workemail: body.workemail || null,
+    personalemail: body.personalemail || null,
+    phone: body.phone || null,
 
-        present_address:
-          body.presentAddress || null,
+    dob: body.dob ? new Date(body.dob) : null,
 
-        permanent_address:
-          body.permanentAddress || null,
+    gender: body.gender || null,
 
-        joining_date: body.joining_date
-          ? new Date(body.joining_date)
-          : null,
+    present_address: body.presentAddress || null,
+    permanent_address: body.permanentAddress || null,
 
-        designation:
-          body.designation || null,
+    joining_date: body.joining_date
+      ? new Date(body.joining_date)
+      : null,
 
-        team: body.team || null,
+    team: body.team || null,
 
-        department:
-          body.department || null,
+    manager: body.reporting_to || null,
 
-        reporting_to:
-          body.reporting_to || null,
+    department: body.department || null,
 
-        employment_type:
-          body.employment_type || null,
+    reporting_to: body.reporting_to || null,
 
-        role: body.role || null,
+    employment_type: body.employment_type || null,
 
-        aadhaar:
-          body.aadhaar || null,
+    role: body.role || null,
 
-        pan: body.pan || null,
+    aadhaar: body.aadhaar || null,
+    pan: body.pan || null,
+    passport: body.passport || null,
 
-        passport:
-          body.passport || null,
-
-        offer_letter:
-          body.offer_letter || null,
-
-        increment_document:
-          body.increment_document || null,
-      },
-    });
+    offer_letter: body.offer_letter || "",
+    increment_document: body.increment_document || "",
+  },
+});
 
     return NextResponse.json(user);
 
