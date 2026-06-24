@@ -11,6 +11,8 @@ export async function GET() {
 
     return NextResponse.json(projects);
   } catch (error) {
+    console.log(error);
+
     return NextResponse.json(
       { error: "Failed to fetch projects" },
       { status: 500 }
@@ -20,18 +22,30 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const formData = await request.formData();
+
+    const projectName = formData.get("projectName");
+    const projectCode = formData.get("projectCode");
+    const projectDescription = formData.get("projectDescription");
+    const estimatedBudget = formData.get("estimatedBudget");
+    const projectManager = formData.get("projectManager");
+    const startDate = formData.get("startDate");
+    const endDate = formData.get("endDate");
+
+    const files = formData.getAll("files");
+
+    console.log("Uploaded Files:", files);
 
     const project = await prisma.project.create({
       data: {
-        projectName: body.projectName,
-        projectDescription: body.description,
-        projectCode: body.projectNumber,
-        estimatedBudget: Number(body.budget),
-        projectManager: body.cto,
-        approvalStatus: "Pending",
-        projectStatus: "In Progress",
-        teamSize: 0,
+        projectName,
+        projectCode,
+        projectDescription,
+        estimatedBudget: Number(estimatedBudget || 0),
+        projectManager,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        approvalStatus: "Yet to Approve",
       },
     });
 

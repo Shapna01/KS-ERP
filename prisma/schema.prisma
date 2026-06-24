@@ -65,63 +65,94 @@ model Approval {
 }
 
 model Project {
-  id                 Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   projectName        String
-  projectDescription String
   projectCode        String
-  projectManager     String
-  estimatedBudget    Float
-  approvalStatus     String
-  teamSize           Int
-  projectStatus      String
-  createdAt          DateTime @default(now())
+  projectDescription String?
+
+  estimatedBudget Float?
+  projectManager  String
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  approvalStatus String @default("Yet to Approve")
+
+  projectStatus String @default("Pending")
+
+  createdAt DateTime @default(now())
 }
 
-model PurchaseRequest {
-  id               Int      @id @default(autoincrement())
-  prNumber         String   @unique
-  projectNumber    String
-  department       String
-  category         String
-  priority         String
-  requestType      String
-  deliveryAddress  String?
-  notes            String?
-  status           String
-  items            PurchaseRequestItem[]
-  rfqs             RFQ[]
+
+
+model ProductVendor {
+  id Int @id @default(autoincrement())
+
+  productId Int
+  vendorId  Int
+
+  product Product @relation(fields: [productId], references: [id])
+  vendor  Vendor  @relation(fields: [vendorId], references: [id])
+
+  @@unique([productId, vendorId])
 }
 
-model PurchaseRequestItem {
-  id                Int      @id @default(autoincrement())
-  purchaseRequestId Int
-  itemName          String
-  itemCode          String
-  quantity          Int
-  estimatedRate     Float
-  unit              String
-  remarks           String?
+model PurchaseRequisition {
+  id                   Int       @id @default(autoincrement())
+  prNumber             String    @unique
+  projectNumber        String
+  category             String
+  priority             String
+  deliveryAddress      String
+  requestorDept        String
+  expectedDeliveryDate DateTime?
+  reason               String
+  status               String    @default("Pending")
+  createdAt            DateTime  @default(now())
+}
 
-  purchaseRequest PurchaseRequest
-    @relation(fields:[purchaseRequestId], references:[id])
+model Product {
+  id             Int      @id @default(autoincrement())
+  productName    String
+  productCode    String   @unique
+  specification  String?
+  estimatedPrice Float?
+
+  createdAt      DateTime @default(now())
+  productVendors ProductVendor[]
 }
 
 model Vendor {
-  id          Int      @id @default(autoincrement())
-  vendorName  String
-  contactNo   String
-  email       String
-  gstNo       String?
-  address     String?
-}
+  id Int @id @default(autoincrement())
 
-model RFQ {
-  id                Int      @id @default(autoincrement())
-  rfqNumber         String   @unique
-  purchaseRequestId Int
-  dueDate           DateTime
-  status            String
+  // Company Details
+  vendorName      String
+  establishedDate DateTime?
+  panNumber       String?
+  gstNumber       String?
+  serviceCategory String?
+  legalStructure  String?
+  annualSales     String?
+  msmeRegistered  String?
+  address         String?
 
-  purchaseRequest PurchaseRequest
-    @relation(fields:[purchaseRequestId], references:[id])
+  // Contact Details
+  contactName     String?
+  contactNumber   String?
+  contactEmail    String?
+  fax             String?
+  website         String?
+  upiId           String?
+
+  // Account Details
+  beneficiaryName String?
+  accountNumber   String?
+  bankName        String?
+  branchName      String?
+  ifscCode        String?
+
+  products ProductVendor[]
+
+  createdAt DateTime @default(now())
 }

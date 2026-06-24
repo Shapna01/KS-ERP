@@ -1,234 +1,214 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search, Filter, Upload } from "lucide-react";
+
 import Sidebar from "../users/components/Sidebar";
 import Topbar from "../users/components/Topbar";
-import {
-  Search,
-  Filter,
-  Upload,
-} from "lucide-react";
-import Link from "next/link";
 
 export default function ProjectsPage() {
+  const router = useRouter();
+
   const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/projects");
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch projects");
-        }
-
-        const data = await res.json();
-        setProjects(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProjects();
   }, []);
+  async function fetchProjects() {
+    try {
+      const response = await fetch("/api/projects");
+      const data = await response.json();
 
-  const getApprovalBadge = (status) => {
-    switch (status) {
-      case "Approved":
-        return "bg-green-100 text-green-700";
-      case "Rejected":
-        return "bg-red-100 text-red-700";
-      case "On Hold":
-        return "bg-gray-100 text-gray-700";
-      default:
-        return "bg-yellow-100 text-yellow-700";
+      setProjects(data);
+      setFilteredProjects(data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
-  const getProjectBadge = (status) => {
-    switch (status) {
-      case "Completed":
-        return "bg-green-100 text-green-700";
-      case "In Progress":
-        return "bg-yellow-100 text-yellow-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
+  useEffect(() => {
+    const filtered = projects.filter((project) => {
+      const search = searchTerm.toLowerCase();
+
+      return (
+        project.projectName?.toLowerCase().includes(search) ||
+        project.projectDescription?.toLowerCase().includes(search) ||
+        project.projectCode?.toLowerCase().includes(search)
+      );
+    });
+
+    setFilteredProjects(filtered);
+  }, [searchTerm, projects]);
 
   return (
     <div className="flex min-h-screen bg-[#F7F7FA]">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col ml-[74px]">
+      <div className="flex-1 flex flex-col overflow-hidden ml-[74px]">
         <Topbar />
 
-        <div className="flex-1 overflow-y-auto pt-[72px] px-8 py-7">
-          <div className="flex items-start justify-between mb-8">
-  <div>
-    <h1 className="text-[30px] font-semibold text-[#7A008C]">
-      Projects
-    </h1>
+        <div className="flex-1 overflow-y-auto pt-[72px] ">
+          <div className="px-8 py-7">
 
-    <p className="text-sm text-gray-500 mt-2 max-w-4xl leading-5">
-      Allows administrators to design and manage approval workflows by
-      specifying approval levels, approvers, escalation rules, and
-      conditions such as amount, project, or department.
-    </p>
-  </div>
-
-  <Link href="/dashboard/projects/create">
-    <button className="bg-[#7A008C] hover:bg-[#650075] text-white px-5 h-11 rounded-lg text-sm font-medium">
-      + Create New
-    </button>
-  </Link>
-</div>
-
-          <div className="bg-white rounded-2xl p-6 border ">
-            <div className="flex items-center justify-between mb-6 ">
-              <div className="text-[#7A008C]">
-                <h2 className="font-semibold text-xl text-black">
-                  Project Details ({projects.length})
-                </h2>
-
-                <div className="flex gap-5 mt-4 text-sm ">
-                  <button className="text-[#7A008C] border-b-2 border-[#7A008C]">
-                    All Projects
-                  </button>
-
-                  <button>Approved</button>
-                  <button>Yet To Approve</button>
-                  <button>Rejected</button>
-                  <button>On Hold</button>
+            <div className="flex items-start justify-between mb-8 ">
+              <div>
+                <div className="text-sm text-gray-500 mb-6">
+                  <span className="text-[#7A008C]">Projects</span>
+                  <span className="mx-2">{">"}</span>
+                  <span>Project List</span>
                 </div>
+                <h1 className="text-3xl font-bold text-[#7A008C] ">
+                  Projects
+                </h1>
+
+                <p className="text-sm text-gray-500 mt-2">
+                  Manage all projects.
+                </p>
               </div>
 
-              <div className="flex gap-3">
-                <div className="relative">
-                  <Search
-                    size={16}
-                    className="absolute left-3 top-3 text-gray-400"
-                  />
-
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="border rounded-lg pl-10 pr-4 h-10"
-                  />
-                </div>
-
-                <button className="border rounded-lg p-2">
-                  <Filter size={16} />
-                </button>
-
-                <button className="border rounded-lg p-2">
-                  <Upload size={16} />
-                </button>
-              </div>
+              <button
+                onClick={() => router.push("/dashboard/projects/create")}
+                className="bg-[#7A008C] hover:bg-purple-900 text-white px-6 h-11 rounded-xl shadow-sm transition"
+              >
+                + Create New 
+              </button>
             </div>
 
-            <div className="overflow-hidden rounded-xl border ">
-              <table className="w-full text-sm text-black">
-                <thead className="bg-[#F8F8FC]">
-                  <tr>
-                    <th className="p-4"></th>
-                    <th className="p-4 text-left">Project Name</th>
-                    <th className="p-4 text-left">
-                      Project Description
-                    </th>
-                    <th className="p-4 text-left">Project ID</th>
-                    <th className="p-4 text-left">
-                      Project Manager
-                    </th>
-                    <th className="p-4 text-left">
-                      Estimated Budget
-                    </th>
-                    <th className="p-4 text-left">
-                      Approval Status
-                    </th>
-                    <th className="p-4 text-left">Team Size</th>
-                    <th className="p-4 text-left">
-                      Project Status
-                    </th>
-                  </tr>
-                </thead>
+            <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 text-gray-500">
 
-                <tbody>
-                  {loading ? (
+              <div className="flex justify-between mb-6">
+                <h2 className="font-semibold text-2xl">
+                  Project Details ({filteredProjects.length})
+                </h2>
+
+                <div className="flex gap-3">
+
+                  <div className="relative">
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-3 text-gray-400"
+                    />
+
+                    <input
+                      value={searchTerm}
+                      onChange={(e) =>
+                        setSearchTerm(e.target.value)
+                      }
+                      placeholder="Search"
+                      className="h-11 w-64 border border-gray-300 rounded-xl pl-10 pr-4 outline-none focus:border-[#7A008C]"
+                    />
+                  </div>
+
+                  <button className="w-11 h-11 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
+                    <Filter size={16} />
+                  </button>
+
+                  <button className="w-11 h-11 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
+                    <Upload size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-2xl border border-gray-200">
+
+                <table className="w-full">
+
+                  <thead className="bg-gray-50 text-gray-700">
                     <tr>
-                      <td
-                        colSpan="9"
-                        className="text-center p-6"
-                      >
-                        Loading...
-                      </td>
+                      <th className="p-4 text-left font-semibold">Project Name</th>
+                      <th className="p-4 text-left font-semibold">Description</th>
+                      <th className="p-4 text-left font-semibold">Code</th>
+                      <th className="p-4 text-left font-semibold">Manager</th>
+                      <th className="p-4 text-left font-semibold">Budget</th>
+                      <th className="p-4 text-left font-semibold">Approval Status</th>
+                      <th className="p-4 text-left font-semibold">Project Status</th>
                     </tr>
-                  ) : (
-                    projects.map((project) => (
-                      <tr
-                        key={project.id}
-                        className="border-t"
-                      >
-                        <td className="p-4">
-                          <input type="checkbox" />
-                        </td>
+                  </thead>
 
-                        <td className="p-4">
-                          {project.projectName}
-                        </td>
+                  <tbody>
 
-                        <td className="p-4">
-                          {project.projectDescription}
+                    {loading ? (
+                      <tr>
+                        <td colSpan="5" className="p-10 text-center">
+                          Loading...
                         </td>
-
-                        <td className="p-4">
-                          {project.projectCode}
-                        </td>
-
-                        <td className="p-4">
-                          {project.projectManager}
-                        </td>
-
-                        <td className="p-4">
-                          ₹{project.estimatedBudget}
-                        </td>
-
-                        <td className="p-4">
+                      </tr>
+                    ) : (
+                      filteredProjects.map((project) => (
+                        <tr
+                          key={project.id}
+                          className="border-t border-gray-100 cursor-pointer hover:bg-[#FAFAFA] transition"
+                          onClick={() =>
+                            router.push(`/dashboard/projects/${project.id}`)
+                          }
+                        >
+                          <td className="p-4">{project.projectName}</td>
+                          <td className="p-4">{project.projectDescription}</td>
+                          <td className="p-4">{project.projectCode}</td>
+                          <td className="p-4">{project.projectManager}</td>
+                          <td className="p-4">
+                            ₹{project.estimatedBudget}
+                          </td>
+                          <td className="p-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs ${getApprovalBadge(
-                              project.approvalStatus
-                            )}`}
+                            className={`px-3 py-1 rounded-full text-xs
+                              ${
+                                project.approvalStatus === "Approved"
+                                  ? ""
+                                  : project.approvalStatus === "Rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : project.approvalStatus === "Hold"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }
+                            `}
                           >
                             {project.approvalStatus}
                           </span>
                         </td>
-
                         <td className="p-4">
-                          {project.teamSize}
-                        </td>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs
+                            ${
+                              project.approvalStatus === "Approved"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : project.approvalStatus === "Rejected"
+                                ? "bg-red-100 text-red-700"
+                                : project.approvalStatus === "Hold"
+                                ? "bg-gray-200 text-gray-700"
+                                : "bg-gray-100 text-gray-500"
+                            }
+                          `}
+                        >
+                          {project.approvalStatus === "Approved"
+                            ? "In Progress"
+                            : project.approvalStatus === "Rejected"
+                            ? "Rejected"
+                            : project.approvalStatus === "Hold"
+                            ? "On Hold"
+                            : "-----"}
+                        </span>
+                      </td>
+                        </tr>
+                      ))
+                    )}
 
-                        <td className="p-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs ${getProjectBadge(
-                              project.projectStatus
-                            )}`}
-                          >
-                            {project.projectStatus}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                  </tbody>
+
+                </table>
+
+              </div>
             </div>
+
           </div>
         </div>
       </div>
     </div>
   );
 }
-

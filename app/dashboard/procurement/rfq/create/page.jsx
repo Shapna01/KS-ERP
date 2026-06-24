@@ -13,12 +13,10 @@ export default function CreateRFQPage() {
         <Topbar />
 
         <div className="flex-1 overflow-y-auto pt-[72px] px-8 py-6">
-          {/* Breadcrumb */}
           <div className="text-xs text-[#7A008C] mb-4">
             Procurement &gt; PR RFQ 2345 &gt; Create RFQ
           </div>
 
-          {/* Header */}
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-[28px] font-semibold text-black">
@@ -37,9 +35,7 @@ export default function CreateRFQPage() {
             </button>
           </div>
 
-          {/* Main Card */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            {/* Stepper */}
             <div className="mb-8">
               <div className="grid grid-cols-3 text-xs text-center text-gray-500 mb-2">
                 <span className="font-medium text-[#7A008C]">
@@ -56,7 +52,6 @@ export default function CreateRFQPage() {
               </div>
             </div>
 
-            {/* Purchase Requisition Details */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div>
                 <label className="text-xs text-gray-500">
@@ -150,7 +145,6 @@ export default function CreateRFQPage() {
               </div>
             </div>
 
-            {/* Delivery Address */}
             <div className="mb-5">
               <label className="text-xs text-gray-500">
                 Delivery Address
@@ -163,7 +157,6 @@ export default function CreateRFQPage() {
               />
             </div>
 
-            {/* Notes */}
             <div className="mb-6">
               <label className="text-xs text-gray-500">
                 Notes For Vendors
@@ -176,7 +169,6 @@ export default function CreateRFQPage() {
               />
             </div>
 
-            {/* Review Settings */}
             <div className="border rounded-lg p-4 mb-6 bg-gray-50">
               <p className="text-sm text-gray-600">
                 Allows reviewers to approve, hold, or reject purchase
@@ -185,7 +177,6 @@ export default function CreateRFQPage() {
               </p>
             </div>
 
-            {/* Review Type */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div>
                 <label className="text-xs text-gray-500">
@@ -209,7 +200,6 @@ export default function CreateRFQPage() {
               </div>
             </div>
 
-            {/* Vendors */}
             <h2 className="font-semibold text-sm mb-3">
               Select Vendors
             </h2>
@@ -246,7 +236,6 @@ export default function CreateRFQPage() {
               </div>
             </div>
 
-            {/* Items */}
             <h2 className="font-semibold text-sm mb-3">
               Added Items
             </h2>
@@ -295,7 +284,6 @@ export default function CreateRFQPage() {
               </div>
             </div>
 
-            {/* Additional Info */}
             <h2 className="font-semibold text-sm mb-3">
               Additional Info
             </h2>
@@ -318,7 +306,6 @@ export default function CreateRFQPage() {
               </select>
             </div>
 
-            {/* Attachments */}
             <h2 className="font-semibold text-sm mb-3">
               Attachments
             </h2>
@@ -373,7 +360,6 @@ export default function CreateRFQPage() {
               </table>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end gap-3">
               <Link href="/dashboard/procurement/rfq">
                 <button className="border px-5 py-2 rounded-lg">

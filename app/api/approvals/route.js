@@ -25,17 +25,22 @@ export async function POST(request) {
     console.log(body);
 
     const project = await prisma.project.create({
-      data: {
-        projectName: body.projectName,
-        projectDescription: body.description,
-        projectCode: body.projectNumber,
-        projectManager: body.cto,
-        estimatedBudget: parseFloat(body.budget),
-        approvalStatus: "Pending",
-        projectStatus: "In Progress",
-        teamSize: 0,
-      },
-    });
+  data: {
+    projectName: body.projectName,
+    projectCode: body.projectCode,
+    projectDescription: body.projectDescription,
+    estimatedBudget: Number(body.estimatedBudget),
+    projectManager: body.projectManager,
+    startDate: body.startDate
+      ? new Date(body.startDate)
+      : null,
+    endDate: body.endDate
+      ? new Date(body.endDate)
+      : null,
+
+    approvalStatus: "Yet to Approve",
+  },
+});
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {

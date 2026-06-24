@@ -12,25 +12,33 @@ export default function CreateApprovalPage() {
   levels: 5,
   status: "Activated",
 });
-
+const [attachment, setAttachment] = useState(null);
 const handleSubmit = async () => {
   try {
+    const data = new FormData();
+
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("module", formData.module);
+    data.append("levels", formData.levels);
+    data.append("status", formData.status);
+
+    if (attachment) {
+      data.append("attachment", attachment);
+    }
+
     const res = await fetch("/api/approvals", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      body: data,
     });
 
-    const data = await res.json();
+    const result = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.message);
+      throw new Error(result.message);
     }
 
     alert("Approval Created Successfully");
-
     window.location.href = "/dashboard/approvals";
   } catch (error) {
     console.error(error);
@@ -96,6 +104,17 @@ const handleSubmit = async () => {
     />
     Activate
   </label>
+  <div className="mb-6">
+  <label className="text-sm text-gray-600 block mb-2">
+    Attachment
+  </label>
+
+  <input
+    type="file"
+    onChange={(e) => setAttachment(e.target.files[0])}
+    className="w-full border rounded-lg px-3 py-2"
+  />
+</div>
 
   <label className="flex items-center gap-2">
     <input
@@ -273,6 +292,25 @@ const handleSubmit = async () => {
                   ))}
                 </tbody>
               </table>
+
+              <div className="mb-6">
+  <label className="text-sm text-gray-600 block mb-2">
+    Attachment
+  </label>
+
+  <input
+    type="file"
+    accept=".pdf,.doc,.docx"
+    onChange={(e) => setAttachment(e.target.files[0])}
+    className="w-full border rounded-lg px-3 py-2"
+  />
+
+  {attachment && (
+    <p className="text-sm text-green-600 mt-2">
+      Selected file: {attachment.name}
+    </p>
+  )}
+</div>
 
               <div className="flex justify-end gap-3 mt-8">
                 <button className="border px-5 py-2 rounded-lg">

@@ -1,7 +1,7 @@
 "use client";
 
-import Sidebar from "../../users/components/Sidebar";
-import Topbar from "../../users/components/Topbar";
+import Sidebar from "../users/components/Sidebar";
+import Topbar from "../users/components/Topbar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -14,7 +14,7 @@ import {
 export default function ApprovalsPage() {
   const [approvals, setApprovals] = useState([]);
 const [loading, setLoading] = useState(true);
-
+const [specFile, setSpecFile] = useState(null);
 useEffect(() => {
   const fetchApprovals = async () => {
     try {
@@ -58,10 +58,10 @@ useEffect(() => {
               </div>
 
               <Link href="/dashboard/approvals/create">
-  <button className="bg-[#7A008C] hover:bg-[#5f006d] text-white px-5 h-11 rounded-lg text-sm font-medium">
-    + Add New
-  </button>
-</Link>
+              <button className="bg-[#7A008C] hover:bg-[#5f006d] text-white px-5 h-11 rounded-lg text-sm font-medium">
+               + Add New
+              </button>
+              </Link>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -100,96 +100,102 @@ useEffect(() => {
                     <Filter size={16} />
                   </button>
 
-                  <button className="w-10 h-10 border rounded-lg flex items-center justify-center bg-white">
-                    <Upload size={16} />
-                  </button>
+                  <label className="w-10 h-10 border rounded-lg flex items-center justify-center bg-white cursor-pointer">
+  <Upload size={16} />
+
+  <input
+    type="file"
+    className="hidden"
+    onChange={(e) => setSelectedFile(e.target.files[0])}
+  />
+</label>
                 </div>
               </div>
 
               <div className="overflow-hidden rounded-xl border">
-  <table className="w-full text-sm">
-    <thead className="bg-[#F8F8FC]">
-      <tr className="text-left text-gray-500">
-        <th className="p-4">
-          <input type="checkbox" />
-        </th>
-        <th className="p-4">Approval Name</th>
-        <th className="p-4">Approval Description</th>
-        <th className="p-4">Module Name</th>
-        <th className="p-4">Levels</th>
-        <th className="p-4">Status</th>
-        <th className="p-4">Created On</th>
-        <th className="p-4">Actions</th>
-      </tr>
-    </thead>
+              <table className="w-full text-sm">
+                <thead className="bg-[#F8F8FC]">
+                  <tr className="text-left text-gray-500">
+                    <th className="p-4">
+                      <input type="checkbox" />
+                    </th>
+                    <th className="p-4">Approval Name</th>
+                    <th className="p-4">Approval Description</th>
+                    <th className="p-4">Module Name</th>
+                    <th className="p-4">Levels</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Created On</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
 
-    <tbody>
-      {loading ? (
-        <tr>
-          <td colSpan="8" className="text-center p-6">
-            Loading...
-          </td>
-        </tr>
-      ) : approvals.length === 0 ? (
-        <tr>
-          <td colSpan="8" className="text-center p-6">
-            No approvals found
-          </td>
-        </tr>
-      ) : (
-        approvals.map((item) => (
-          <tr
-            key={item.id}
-            className="border-t hover:bg-gray-50"
-          >
-            <td className="p-4">
-              <input type="checkbox" />
-            </td>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="8" className="text-center p-6">
+                        Loading...
+                      </td>
+                    </tr>
+                  ) : approvals.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="text-center p-6">
+                        No approvals found
+                      </td>
+                    </tr>
+                  ) : (
+                    approvals.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="border-t hover:bg-gray-50"
+                      >
+                        <td className="p-4">
+                          <input type="checkbox" />
+                        </td>
 
-            <td className="p-4 font-medium text-gray-700">
-              {item.name}
-            </td>
+                        <td className="p-4 font-medium text-gray-700">
+                          {item.name}
+                        </td>
 
-            <td className="p-4 text-gray-500">
-              {item.description}
-            </td>
+                        <td className="p-4 text-gray-500">
+                          {item.description}
+                        </td>
 
-            <td className="p-4 text-gray-600">
-              {item.module}
-            </td>
+                        <td className="p-4 text-gray-600">
+                          {item.module}
+                        </td>
 
-            <td className="p-4 text-gray-600">
-              {item.levels}
-            </td>
+                        <td className="p-4 text-gray-600">
+                          {item.levels}
+                        </td>
 
-            <td className="p-4">
-              <span
-                className={`text-xs px-3 py-1 rounded-full ${
-                  item.status === "Activated"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {item.status}
-              </span>
-            </td>
+                        <td className="p-4">
+                          <span
+                            className={`text-xs px-3 py-1 rounded-full ${
+                              item.status === "Activated"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
 
-            <td className="p-4 text-gray-600">
-              {new Date(item.createdAt).toLocaleDateString()}
-            </td>
+                        <td className="p-4 text-gray-600">
+                          {new Date(item.createdAt).toLocaleDateString()}
+                        </td>
 
-            <td className="p-4">
-              <MoreHorizontal
-                size={18}
-                className="text-[#7A008C] cursor-pointer"
-              />
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</div>
+                      <td className="p-4">
+                        <MoreHorizontal
+                          size={18}
+                          className="text-[#7A008C] cursor-pointer"
+                       />
+                      </td>
+                      </tr> 
+                      ))
+                      )}
+                      </tbody>
+                    </table>
+                </div>
               <div className="flex items-center justify-between mt-6 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   Showing

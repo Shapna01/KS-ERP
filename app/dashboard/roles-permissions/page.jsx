@@ -273,7 +273,7 @@ export default function RolesPermissionsPage() {
                       currentRoles.map((role) => (
 
                         <tr
-  key={role.id}
+  key={role.id} 
   onClick={() =>
     router.push(
       `/dashboard/roles-permissions/${role.id}`

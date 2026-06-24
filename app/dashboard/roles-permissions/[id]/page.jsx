@@ -61,7 +61,6 @@ export default function RoleOverviewPage() {
 
         <div className="pt-[72px] px-8 py-7 overflow-y-auto">
           <div className="flex">
-            {/* LEFT SIDEBAR */}
             <div className="w-[250px] bg-white border rounded-l-2xl">
               <div className="p-5 border-b">
                 <h2 className="font-semibold text-lg">
@@ -76,7 +75,6 @@ export default function RoleOverviewPage() {
               </div>
             </div>
 
-            {/* RIGHT CONTENT */}
             <div className="flex-1 bg-white border border-l-0 rounded-r-2xl p-8">
               <div className="flex items-start justify-between">
                 <div>
@@ -106,7 +104,6 @@ export default function RoleOverviewPage() {
                 </button>
               </div>
 
-              {/* MODULES */}
               <div className="mt-10">
                 <h2 className="font-semibold mb-5">
                   Modules
@@ -156,7 +153,6 @@ export default function RoleOverviewPage() {
                 </div>
               </div>
 
-              {/* PERMISSIONS */}
               <div className="mt-10">
                 <h2 className="font-semibold mb-5">
                   Permissions
@@ -261,7 +257,6 @@ export default function RoleOverviewPage() {
                 </div>
               </div>
 
-              {/* USERS SECTION */}
               <div className="mt-10">
                 <h2 className="font-semibold mb-5">
                   Users
