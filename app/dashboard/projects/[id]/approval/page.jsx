@@ -6,11 +6,14 @@ import ApprovalActions from "./ApprovalActions";
 export default async function ApprovalPage({ params }) {
   const { id } = await params;
 
-  const project = await prisma.project.findUnique({
-    where: {
-      id: Number(id),
-    },
-  });
+const project = await prisma.project.findUnique({
+  where: {
+    id: Number(id),
+  },
+  include: {
+    purchaseRequisitions: true,
+  },
+});
 
   if (!project) {
     return (

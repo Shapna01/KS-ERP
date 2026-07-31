@@ -1,31 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus } from "lucide-react";
 
 export default function ItemsTable() {
   const [items, setItems] = useState([
-    {
-      itemName: "",
-      itemCode: "",
-      quantity: 1,
-      estimatedRate: "",
-      unit: "None",
-      remarks: "",
-    },
-  ]);
+  {
+    productId: "",
+    itemName: "",
+    itemCode: "",
+    quantity: 1,
+    estimatedRate: "",
+    unit: "None",
+    remarks: "",
+  },
+]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+  fetchProducts();
+}, []);
+
+const fetchProducts = async () => {
+  try {
+    const res = await fetch("/api/products");
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   const addItem = () => {
     setItems([
       ...items,
       {
-        itemName: "",
-        itemCode: "",
-        quantity: 1,
-        estimatedRate: "",
-        unit: "None",
-        remarks: "",
-      },
+  productId: "",
+  itemName: "",
+  itemCode: "",
+  quantity: 1,
+  estimatedRate: "",
+  unit: "None",
+  remarks: "",
+},
     ]);
   };
 
@@ -87,27 +104,55 @@ export default function ItemsTable() {
                 </td>
 
                 <td className="border-b border-gray-100 p-3">
-                  <input
-                    value={item.itemName}
-                    onChange={(e) =>
-                      handleChange(index, "itemName", e.target.value)
-                    }
-                    placeholder="Item Name"
-                    className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm
-focus:outline-none focus:ring-2 focus:ring-[#7A008C]/20 focus:border-[#7A008C]"
-                  />
-                </td>
+  <select
+    value={item.productId}
+    onChange={(e) => {
+      if (e.target.value === "__add_new__") {
+        window.location.href = "/dashboard/procurement/products/create";
+        return;
+      }
+
+      const selected = products.find(
+        (p) => p.id === Number(e.target.value)
+      );
+
+      if (!selected) return;
+
+      const updated = [...items];
+
+      updated[index].productId = selected.id;
+updated[index].itemName = selected.productName;
+updated[index].itemCode = selected.productCode;
+updated[index].estimatedRate = selected.estimatedPrice;
+updated[index].unit = "Nos";
+
+      setItems(updated);
+    }}
+    className="w-full h-10 px-3 border border-gray-200 rounded-xl"
+    >
+    <option value="">Select Product</option>
+
+    {products.map((product) => (
+  <option
+    key={product.id}
+    value={product.id}
+  >
+    {product.productName}
+  </option>
+))}
+
+    <option value="__add_new__">
+      + Add New Product
+    </option>
+  </select>
+</td>
 
                 <td className="border-b border-gray-100 p-3">
                   <input
-                    value={item.itemCode}
-                    onChange={(e) =>
-                      handleChange(index, "itemCode", e.target.value)
-                    }
-                    placeholder="BA-ACT 250"
-                    className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm
-focus:outline-none focus:ring-2 focus:ring-[#7A008C]/20 focus:border-[#7A008C]"
-                  />
+  value={item.itemCode || ""}
+  readOnly
+  className="w-full h-10 px-3 border border-gray-200 rounded-xl bg-gray-50"
+/>
                 </td>
 
                 <td className="border-b border-gray-100 p-3">
@@ -137,35 +182,23 @@ focus:outline-none focus:ring-2 focus:ring-[#7A008C]/20 focus:border-[#7A008C]"
 
                 <td className="border p-2">
                   <input
-                    value={item.estimatedRate}
-                    onChange={(e) =>
-                      handleChange(index, "estimatedRate", e.target.value)
-                    }
-                    placeholder="2700"
-                    className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm
-focus:outline-none focus:ring-2 focus:ring-[#7A008C]/20 focus:border-[#7A008C]"
-                  />
-                </td>
-
-                <td className="border p-2">
-                  <select
-                    value={item.unit}
-                    onChange={(e) =>
-                      handleChange(index, "unit", e.target.value)
-                    }
-                    className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm
-focus:outline-none focus:ring-2 focus:ring-[#7A008C]/20 focus:border-[#7A008C]"
-                  >
-                    <option>None</option>
-                    <option>Nos</option>
-                    <option>Kg</option>
-                    <option>Box</option>
-                  </select>
+  value={item.estimatedRate || ""}
+  readOnly
+  className="w-full h-10 px-3 border border-gray-200 rounded-xl bg-gray-50"
+/>
                 </td>
 
                 <td className="border p-2">
                   <input
-                    value={item.remarks}
+                  value={item.unit || "None"}
+                  readOnly
+                  className="w-full h-10 px-3 border border-gray-200 rounded-xl bg-gray-50"
+                />
+                </td>
+
+                <td className="border p-2">
+                  <input
+                    value={item.remarks || ""}
                     onChange={(e) =>
                       handleChange(index, "remarks", e.target.value)
                     }

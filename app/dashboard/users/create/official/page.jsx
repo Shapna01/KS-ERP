@@ -11,22 +11,29 @@ import { ChevronRight } from "lucide-react";
 export default function OfficialDetailsPage() {
   const router = useRouter();
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    joining_date: "",
-    designation: "",
-    team: "",
-    department: "",
-    reporting_to: "",
-    employment_type: "",
-    role: "Team Members",
-  });
+ const [formData, setFormData] = useState({
+  joining_date: "",
+  designationId: "",
+  team: "",
+  department: "",
+  reporting_to: "",
+  employment_type: "",
+  role: "Team Members",
+});
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  setErrors((prev) => ({
+    ...prev,
+    [name]: "",
+  }));
+};
 
   const validateForm = () => {
   const newErrors = {};
@@ -35,12 +42,9 @@ export default function OfficialDetailsPage() {
     newErrors.joining_date = "* Please select joining date";
   }
 
-  if (
-    !formData.designation ||
-    formData.designation === "Select designation"
-  ) {
-    newErrors.designation = "* Please select designation";
-  }
+  if (!formData.designationId) {
+  newErrors.designationId = "* Please select designation";
+}
 
   if (
     !formData.team ||
@@ -208,22 +212,22 @@ export default function OfficialDetailsPage() {
                     required
                   >
                     <select
-                      name="designation"
-                      value={formData.designation}
-                      onChange={handleChange}
-                      className={inputClass}
-                    >
-                      <option>Select designation</option>
-                      <option>UX Designer</option>
-                      <option>Frontend Developer</option>
-                      <option>Backend Developer</option>
-                      <option>Manager</option>
-                    </select>
-                    {errors.designation && (
-                      <p className="text-red-500 text-[10px] mt-1">
-                        {errors.designation}
-                        </p>
-                      )}
+    name="designationId"
+    value={formData.designationId}
+    onChange={handleChange}
+    className={inputClass}
+>
+    <option value="">Select designation</option>
+    <option value="1">UX Designer</option>
+    <option value="2">Frontend Developer</option>
+    <option value="3">Backend Developer</option>
+    <option value="4">Manager</option>
+</select>
+                    {errors.designationId && (
+  <p className="text-red-500 text-[10px] mt-1">
+    {errors.designationId}
+  </p>
+)}
                   </FormField>
 
                   <FormField

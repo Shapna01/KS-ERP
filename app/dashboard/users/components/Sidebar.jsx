@@ -7,16 +7,14 @@ import { usePathname } from "next/navigation";
 import {
   LayoutGrid,
   Users,
-  GitBranch,
-  Boxes,
-  Briefcase,
-  BadgeHelp,
-  FileText,
-  Search,
-  ShieldCheck,
   FolderKanban,
+  ShoppingCart,
+  Boxes,
+  Wallet,
+  Receipt,
+  ShieldCheck,
   CheckSquare,
-
+  Store,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -24,49 +22,43 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const menuItems = [
-    {
-      icon: <LayoutGrid size={18} />,
-      path: "/dashboard",
-    },
-    
-    {
-      icon: <Users size={18} />,
-      path: "/dashboard/users",
-    },
-    {
-  icon: <FolderKanban size={18} />,
-  path: "/dashboard/projects",
-},
-    {
-      icon: <Boxes size={18} />,
-      path: "/dashboard/team",
-    },
-    {
-  icon: <ShieldCheck size={18} />,
-  path: "/dashboard/roles-permissions",
-},
-    {
-      icon: <Briefcase size={18} />,
-      path: "/dashboard/department",
-    },
-    {
-      icon: <BadgeHelp size={18} />,
-      path: "/dashboard/designation",
-    },
-    {
-      icon: <FileText size={18} />,
-      path: "/dashboard/reports",
-    },
-    {
-      icon: <Search size={18} />,
-      path: "/dashboard/search",
-    },
-    {
-  icon: <CheckSquare size={18} />,
-  path: "/dashboard/approvals",
-},
-  ];
-
+  {
+    icon: <LayoutGrid size={18} />,
+    path: "/dashboard",
+  },
+  {
+    icon: <Users size={18} />,
+    path: "/dashboard/users",
+  },
+  {
+    icon: <FolderKanban size={18} />,
+    path: "/dashboard/projects",
+  },
+  {
+    icon: <ShoppingCart size={18} />,
+    path: "/dashboard/procurement",
+  },
+  {
+    icon: <Store size={18} />,
+    path: "/dashboard/procurement/vendors",
+  },
+  {
+    icon: <Wallet size={18} />,
+    path: "/dashboard/finance/reimbursement",
+  },
+  {
+    icon: <Receipt size={18} />,
+    path: "/dashboard/finance/account-payable",
+  },
+  {
+    icon: <ShieldCheck size={18} />,
+    path: "/dashboard/roles-permissions",
+  },
+  {
+    icon: <CheckSquare size={18} />,
+    path: "/dashboard/approvals",
+  },
+];
   return (
 
     <div className="fixed left-0 top-0 w-[74px] h-screen bg-gradient-to-b from-[#4B0055] to-[#7A008C] flex flex-col items-center z-50">

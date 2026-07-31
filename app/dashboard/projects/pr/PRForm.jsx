@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GeneralDetails from "./GeneralDetails";
 import ScheduleSection from "./ScheduleSection";
 import ItemsTable from "./ItemsTable";
@@ -9,9 +9,8 @@ import ActionButtons from "./ActionButtons";
 
 export default function PRForm({ projectId }) {
   const [formData, setFormData] = useState({
-  prNumber: `PR-${Date.now()}`,
-  projectNumber: projectId || "ID 234",
-
+  prNumber: "",
+  projectId: projectId || "",
   category: "Goods",
   priority: "Normal",
 
@@ -27,6 +26,8 @@ export default function PRForm({ projectId }) {
 
   requestType: "One Time",
 });
+const [projects, setProjects] = useState([]);
+
 
   const updateField = (field, value) => {
     setFormData((prev) => ({
@@ -35,6 +36,17 @@ export default function PRForm({ projectId }) {
     }));
   };
 
+  useEffect(() => {
+  fetchProjects();
+}, []);
+
+const fetchProjects = async () => {
+  const res = await fetch("/api/projects");
+  const data = await res.json();
+
+  setProjects(Array.isArray(data) ? data : data.projects || []);
+};
+
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-gray-600">
 
@@ -42,8 +54,29 @@ export default function PRForm({ projectId }) {
 
       <div className="space-y-10">
   <GeneralDetails formData={formData} updateField={updateField} />
+<div>
+  <label className="block text-sm font-medium mb-2">
+    Project
+  </label>
 
-  <ScheduleSection />
+  <select
+    value={formData.projectId}
+    onChange={(e) => updateField("projectId", e.target.value)}
+    className="w-full rounded-xl border border-gray-300 px-4 py-3"
+  >
+    <option value="">Select Project</option>
+
+    {projects.map((project) => (
+      <option key={project.id} value={project.id}>
+        {project.projectName || project.name}
+      </option>
+    ))}
+  </select>
+</div>
+  <ScheduleSection
+  formData={formData}
+  updateField={updateField}
+/>
 
   <ItemsTable />
 

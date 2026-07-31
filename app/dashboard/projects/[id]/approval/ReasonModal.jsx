@@ -9,7 +9,9 @@ export default function ReasonModal({
   setReason,
   onClose,
   onSubmit,
+  
 }) {
+
   if (!open) return null;
 
   return (

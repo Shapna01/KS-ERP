@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Sidebar from "../../users/components/Sidebar";
 import Topbar from "../../users/components/Topbar";
-
+import ProjectSidebar from "../components/ProjectSidebar";
 export default async function ProjectOverview({ params }) {
   const { id } = await params;
 
@@ -9,11 +9,14 @@ export default async function ProjectOverview({ params }) {
     where: {
       id: Number(id),
     },
+    include: {
+      purchaseRequisitions: true,
+    },
   });
 
-  if (!project) {
-    return <div>Project not found</div>;
-  }
+    if (!project) {
+      return <div>Project not found</div>;
+    }
 
   const totalMonths =
     project.startDate && project.endDate
@@ -28,7 +31,9 @@ export default async function ProjectOverview({ params }) {
     <div className="flex min-h-screen bg-[#F8F8FA]">
       <Sidebar />
 
-      <div className="flex-1 ml-[74px]">
+      <ProjectSidebar />
+
+       <div className="flex-1 ml-[324px]">
         <Topbar />
 
         <div className="pt-[100px] px-10 pb-10 bg-[#F7F7FA]">
@@ -36,17 +41,17 @@ export default async function ProjectOverview({ params }) {
           <div className="max-w-7xl mx-auto grid grid-cols-[280px_1fr] gap-8  ">
 
             <div className="
-bg-white
-rounded-[28px]
-border border-slate-100
-shadow-sm
-p-7
-h-fit
-">
+              bg-white
+              rounded-[28px]
+              border border-slate-100
+              shadow-sm
+              p-7
+              h-fit
+              ">
 
               <div className="bg-purple-100 text-[#7A008C] px-4 py-3 rounded-2xl font-medium">
-  {project.projectName}
-</div>
+                {project.projectName}
+              </div>
 
               <div className="space-y-2">
 
@@ -61,12 +66,12 @@ h-fit
             <div>
 
               <div className="
-bg-white
-rounded-[32px]
-border border-slate-100
-shadow-sm
-p-10
-">
+                bg-white
+                rounded-[32px]
+                border border-slate-100
+                shadow-sm
+                p-10
+                ">
 
                 <div className="flex justify-between items-start">
 
@@ -114,31 +119,31 @@ p-10
 
                 <div className="grid md:grid-cols-4 gap-5 mt-10">
 
-  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
-    <p className="text-xs text-gray-500 mb-2">Project Manager</p>
-    <p className="font-semibold text-black">{project.projectManager}</p>
-  </div>
+                  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-2">Project Manager</p>
+                    <p className="font-semibold text-black">{project.projectManager}</p>
+                  </div>
 
-  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
-    <p className="text-xs text-gray-500 mb-2">Team Members</p>
-    <p className="font-semibold text-black">20</p>
-  </div>
+                  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-2">Team Members</p>
+                    <p className="font-semibold text-black">20</p>
+                  </div>
 
-  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
-    <p className="text-xs text-gray-500 mb-2">Start Date</p>
-    <p className="font-semibold text-black">
-      {project.startDate
-        ? new Date(project.startDate).toLocaleDateString()
-        : "-"}
-    </p>
-  </div>
+                  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-2">Start Date</p>
+                    <p className="font-semibold text-black">
+                      {project.startDate
+                        ? new Date(project.startDate).toLocaleDateString()
+                        : "-"}
+                    </p>
+                  </div>
 
-  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
-    <p className="text-xs text-gray-500 mb-2">Project Duration</p>
-    <p className="font-semibold text-black">{totalMonths} Months</p>
-  </div>
+                  <div className="bg-gray-50 rounded-3xl p-5 border border-gray-100 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-2">Project Duration</p>
+                    <p className="font-semibold text-black">{totalMonths} Months</p>
+                  </div>
 
-</div>
+                </div>
 
                 <div className="mt-10 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100 rounded-3xl p-8 shadow-sm">
 
@@ -149,8 +154,8 @@ p-10
                   <div className="mb-4">
 
                     <p className="font-bold text-3xl text-[#7A008C]">
-₹ {Number(project.estimatedBudget).toLocaleString()}
-</p>
+                      ₹ {Number(project.estimatedBudget).toLocaleString()}
+                      </p>
 
                     <p className="font-bold text-lg">
                       ₹{" "}
@@ -187,13 +192,13 @@ p-10
                     </div>
 
                     <div className="
-bg-white
-rounded-3xl
-p-5
-border
-border-gray-100
-shadow-sm
-">
+                        bg-white
+                        rounded-3xl
+                        p-5
+                        border
+                        border-gray-100
+                        shadow-sm
+                        ">
                       <p className="text-xs text-gray-500">
                         Cost Overrun
                       </p>
@@ -216,7 +221,7 @@ shadow-sm
                     border-b-2
                     border-[#7A008C]
                     ">
-                    Purchase Requisitions (12)
+                    Purchase Requisitions ({project.purchaseRequisitions.length})
                     </button>
 
                   <button>
@@ -230,13 +235,13 @@ shadow-sm
                 </div>
 
                 <div className="
-mt-8
-bg-white
-rounded-[28px]
-border border-slate-100
-shadow-sm
-overflow-hidden
-">
+                  mt-8
+                  bg-white
+                  rounded-[28px]
+                  border border-slate-100
+                  shadow-sm
+                  overflow-hidden
+                  ">
 
                   <table className="w-full">
 
@@ -244,7 +249,7 @@ overflow-hidden
 
                       <tr className="text-left text-sm">
 
-                        <th className="p-3">PR No</th>
+                        <th className="p-3 ">PR No</th>
                         <th className="p-3">Type</th>
                         <th className="p-3">Priority</th>
                         <th className="p-3">Status</th>
@@ -254,19 +259,22 @@ overflow-hidden
                     </thead>
 
                     <tbody>
-
-                      <tr>
-
-                        <td className="p-8 text-center text-gray-400">
-                          No requisitions yet
+                      {project.purchaseRequisitions.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-8 text-center text-gray-400">
+                            No requisitions yet
                           </td>
-
-                        <td />
-                        <td />
-                        <td />
-
-                      </tr>
-
+                        </tr>
+                      ) : (
+                        project.purchaseRequisitions.map((pr) => (
+                          <tr key={pr.id} className="border-t">
+                            <td className="p-3">{pr.prNumber}</td>
+                            <td className="p-3">{pr.category}</td>
+                            <td className="p-3">{pr.priority}</td>
+                            <td className="p-3">{pr.status}</td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
 
                   </table>

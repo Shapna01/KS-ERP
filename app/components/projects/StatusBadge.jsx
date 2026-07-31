@@ -1,4 +1,3 @@
-// components/projects/StatusBadge.jsx
 
 export default function StatusBadge({
   status,

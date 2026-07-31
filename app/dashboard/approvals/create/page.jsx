@@ -5,37 +5,40 @@ import Topbar from "../../users/components/Topbar";
 import { useState } from "react";
 
 export default function CreateApprovalPage() {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
   name: "",
   description: "",
   module: "",
   levels: 5,
   status: "Activated",
+  approvalType: "User Based",
+  amountBased: false,
+  notifyApp: false,
+  notifyMail: false,
+
+  approvalLevels: [1, 2, 3, 4, 5].map((level) => ({
+    level,
+    approverId: "",
+    canApprove: false,
+    canReject: false,
+    canHold: false,
+  })),
 });
 const [attachment, setAttachment] = useState(null);
 const handleSubmit = async () => {
   try {
-    const data = new FormData();
-
-    data.append("name", formData.name);
-    data.append("description", formData.description);
-    data.append("module", formData.module);
-    data.append("levels", formData.levels);
-    data.append("status", formData.status);
-
-    if (attachment) {
-      data.append("attachment", attachment);
-    }
-
     const res = await fetch("/api/approvals", {
       method: "POST",
-      body: data,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
 
     const result = await res.json();
 
     if (!res.ok) {
-      throw new Error(result.message);
+      throw new Error(result.error || "Failed");
     }
 
     alert("Approval Created Successfully");
@@ -53,25 +56,25 @@ const handleSubmit = async () => {
       <div className="flex-1 flex flex-col ml-[74px]">
         <Topbar />
 
-        <div className="flex-1 overflow-y-auto pt-[72px] px-8 py-7">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-sm text-gray-400 mb-6">
+        <div className="flex-1 overflow-y-auto pt-[100px] px-8 py-7">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-sm font-medium text-gray-500 mb-6">
               Roles &gt; Create New
             </div>
 
-            <h1 className="text-3xl font-semibold mb-2">
+            <h1 className="text-4xl font-bold text-[#7A008C] mb-2">
               Create New Approval
             </h1>
 
-            <p className="text-sm text-gray-500 mb-8">
-              Create and configure approval workflows by defining approval
+<p className="text-[14px] leading-6 text-[#6B7280] mb-10 max-w-4xl">
+                Create and configure approval workflows by defining approval
               levels and approvers.
             </p>
 
-            <div className="bg-white border rounded-2xl p-6">
+            <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-10">
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-[13px] font-medium text-[#6B7280]">
                     Approval Name
                   </label>
 
@@ -85,56 +88,59 @@ const handleSubmit = async () => {
     })
   }
   placeholder="Purchase Order Approval"
-  className="w-full border rounded-lg px-3 py-2"
-/>
-                </div>
+className="w-full h-10 rounded-lg border border-[#D1D5DB] bg-white px-4 text-[14px] text-[#374151] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none"></input>                </div>
 
                 <div className="flex gap-3">
-  <label className="flex items-center gap-2">
-    <input
-      type="radio"
-      name="status"
-      checked={formData.status === "Activated"}
-      onChange={() =>
-        setFormData({
-          ...formData,
-          status: "Activated",
-        })
-      }
-    />
-    Activate
-  </label>
-  <div className="mb-6">
-  <label className="text-sm text-gray-600 block mb-2">
-    Attachment
-  </label>
+  <label
+      className={`flex items-center gap-2 px-5 h-10 rounded-lg border cursor-pointer transition
+      ${
+        formData.status === "Activated"
+          ? "bg-[#FDF2FF] border-[#D946EF] text-[#A21CAF]"
+          : "bg-white border-[#D1D5DB] text-[#6B7280] hover:border-[#A21CAF]"
+      }`}
+    >
+      <input
+        type="radio"
+        name="status"
+        checked={formData.status === "Activated"}
+        onChange={() =>
+          setFormData({
+            ...formData,
+            status: "Activated",
+          })
+        }
+        className="accent-[#A21CAF]"
+      />
+      <span className="text-sm font-medium">Activate</span>
+    </label>
 
-  <input
-    type="file"
-    onChange={(e) => setAttachment(e.target.files[0])}
-    className="w-full border rounded-lg px-3 py-2"
-  />
-</div>
-
-  <label className="flex items-center gap-2">
-    <input
-      type="radio"
-      name="status"
-      checked={formData.status === "Deactivated"}
-      onChange={() =>
-        setFormData({
-          ...formData,
-          status: "Deactivated",
-        })
-      }
-    />
-    De-Activate
-  </label>
+    <label
+      className={`flex items-center gap-2 px-5 h-10 rounded-lg border cursor-pointer transition
+      ${
+        formData.status === "Deactivated"
+          ? "bg-[#FDF2FF] border-[#D946EF] text-[#A21CAF]"
+          : "bg-white border-[#D1D5DB] text-[#6B7280] hover:border-[#A21CAF]"
+      }`}
+    >
+      <input
+        type="radio"
+        name="status"
+        checked={formData.status === "Deactivated"}
+        onChange={() =>
+          setFormData({
+            ...formData,
+            status: "Deactivated",
+          })
+        }
+        className="accent-[#A21CAF]"
+      />
+      <span className="text-sm font-medium">De-Activate</span>
+    </label>
 </div>
               </div>
 
               <div className="mb-6">
-                <label className="text-sm text-gray-600 block mb-2">
+                <label className="block mb-2 text-sm font-semibold text-gray-800">
                   Approval Description
                 </label>
 
@@ -147,13 +153,12 @@ const handleSubmit = async () => {
       description: e.target.value,
     })
   }
-  className="w-full border rounded-lg px-3 py-2"
-/>
+className="w-full rounded-lg border border-[#D1D5DB] px-4 py-3 text-[14px] text-[#374151] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none resize-none"/>
               </div>
 
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-sm font-semibold text-gray-800">
                     Choose Module
                   </label>
 
@@ -165,8 +170,7 @@ const handleSubmit = async () => {
       module: e.target.value,
     })
   }
-  className="w-full border rounded-lg px-3 py-2"
->
+className="w-full rounded-lg border border-[#D1D5DB] px-4 py-3 text-[14px] text-[#374151] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none resize-none">
                     <option>Purchase Requisition</option>
                     <option>Purchase Order</option>
                     <option>Reimbursement</option>
@@ -174,7 +178,7 @@ const handleSubmit = async () => {
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-sm font-semibold text-gray-800">
                     Select Approval Levels
                   </label>
 
@@ -186,8 +190,7 @@ const handleSubmit = async () => {
       levels: Number(e.target.value),
     })
   }
-  className="w-full border rounded-lg px-3 py-2"
->
+className="w-full rounded-lg border border-[#D1D5DB] px-4 py-3 text-[14px] text-[#374151] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none resize-none">
   <option value={5}>5 Levels</option>
   <option value={4}>4 Levels</option>
   <option value={3}>3 Levels</option>
@@ -197,104 +200,232 @@ const handleSubmit = async () => {
 
               <div className="grid grid-cols-3 gap-6 mb-8">
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-sm font-semibold text-gray-800">
                     Approval Type
                   </label>
 
                   <div className="flex gap-4">
-                    <label>
-                      <input type="radio" name="type" />
-                      Role Based
-                    </label>
+                    <label
+      className={`flex items-center gap-2 px-5 h-10 rounded-lg border cursor-pointer transition
+      ${
+        formData.approvalType === "Role Based"
+          ? "bg-[#FDF2FF] border-[#D946EF] text-[#A21CAF]"
+          : "bg-white border-[#D1D5DB] text-[#6B7280] hover:border-[#A21CAF]"
+      }`}
+    >
+      <input
+        type="radio"
+        name="type"
+        checked={formData.approvalType === "Role Based"}
+        onChange={() =>
+          setFormData({
+            ...formData,
+            approvalType: "Role Based",
+          })
+        }
+        className="accent-[#A21CAF]"
+      />
+      <span className="text-sm font-medium">Role Based</span>
+    </label>
 
-                    <label>
-                      <input
-                        type="radio"
-                        name="type"
-                        defaultChecked
-                      />
-                      User Based
-                    </label>
+    <label
+      className={`flex items-center gap-2 px-5 h-10 rounded-lg border cursor-pointer transition
+      ${
+        formData.approvalType === "User Based"
+          ? "bg-[#FDF2FF] border-[#D946EF] text-[#A21CAF]"
+          : "bg-white border-[#D1D5DB] text-[#6B7280] hover:border-[#A21CAF]"
+      }`}
+    >
+      <input
+        type="radio"
+        name="type"
+        checked={formData.approvalType === "User Based"}
+        onChange={() =>
+          setFormData({
+            ...formData,
+            approvalType: "User Based",
+          })
+        }
+        className="accent-[#A21CAF]"
+      />
+      <span className="text-sm font-medium">User Based</span>
+    </label>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-sm font-semibold text-gray-800">
                     Include Amount Based Approval
                   </label>
 
-                  <select className="w-full border rounded-lg px-3 py-2">
-                    <option>No</option>
-                    <option>Yes</option>
-                  </select>
+                  <select
+  value={formData.amountBased ? "Yes" : "No"}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      amountBased: e.target.value === "Yes",
+    })
+  }
+  className="w-full rounded-lg border border-[#D1D5DB] px-4 py-3 text-[14px] text-[#374151] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none"
+>
+  <option>No</option>
+  <option>Yes</option>
+</select>
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-600 block mb-2">
+                  <label className="block mb-2 text-sm font-semibold text-gray-800">
                     Notification Settings
                   </label>
 
                   <div className="flex gap-3">
-                    <label>
-                      <input type="checkbox" />
-                      In-App
-                    </label>
+                                        <label className="flex items-center gap-2 px-4 h-10 rounded-lg border border-[#F3D5F8] bg-[#FDF4FF] text-[#A21CAF] cursor-pointer">
+  <input
+    type="checkbox"
+    checked={formData.notifyApp}
+    onChange={(e)=>
+      setFormData({
+        ...formData,
+        notifyApp:e.target.checked
+      })
+    }
+    className="accent-[#A21CAF]"
+  />
+  In-App
+</label>
 
-                    <label>
-                      <input type="checkbox" />
-                      In-Mail
-                    </label>
+<label className="flex items-center gap-2 px-4 h-10 rounded-lg border border-[#F3D5F8] bg-[#FDF4FF] text-[#A21CAF] cursor-pointer">
+  <input
+    type="checkbox"
+    checked={formData.notifyMail}
+    onChange={(e)=>
+      setFormData({
+        ...formData,
+        notifyMail:e.target.checked
+      })
+    }
+    className="accent-[#A21CAF]"
+  />
+  In-Mail
+</label>
                   </div>
                 </div>
               </div>
 
-              <h2 className="font-semibold text-lg mb-4">
-                Approval Levels
-              </h2>
+              <h2 className="text-[24px] font-semibold text-[#111827]">
+Approval Levels
+</h2>
 
-              <table className="w-full border rounded-lg overflow-hidden text-sm">
-                <thead className="bg-gray-50">
+<p className="text-[13px] text-[#6B7280] mb-5">
+Specifies the ordered stages of approval a request must go through.
+</p>
+
+              <table className="w-full rounded-xl overflow-hidden border border-[#E5E7EB]">
+                <thead className="bg-gradient-to-r from-[#FCFAFD] to-[#F8F3FF]">
                   <tr>
-                    <th className="p-3 text-left">Level</th>
-                    <th className="p-3 text-left">Approver</th>
-                    <th className="p-3 text-left">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280]
+uppercase tracking-wide text-xs">Level</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280]
+uppercase tracking-wide text-xs">Approver</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280]
+uppercase tracking-wide text-xs">Actions</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {[1, 2, 3, 4, 5].map((level) => (
-                    <tr key={level} className="border-t">
-                      <td className="p-3">L{level}</td>
+  {formData.approvalLevels.map((item, index) => (
+    <tr
+  key={index}
+className="border-t border-[#E5E7EB] hover:bg-[#FCF5FF] transition-colors duration-200">
+      <td className="px-6 py-4 text-gray-700">L{item.level}</td>
 
-                      <td className="p-3">
-                        <select className="border rounded px-2 py-1 w-full">
-                          <option>Select User</option>
-                        </select>
-                      </td>
+      <td className="px-6 py-4 text-gray-700">
+       <select
+  className="w-full h-10 rounded-lg border border-[#D1D5DB] px-3 text-sm text-[#374151] focus:border-[#A21CAF] focus:ring-2 focus:ring-[#F4D4FB]"
+  value={item.approverId}
+  onChange={(e) => {
+    const updated = [...formData.approvalLevels];
+    updated[index].approverId = e.target.value;
 
-                      <td className="p-3 flex gap-4">
-                        <label>
-                          <input type="checkbox" />
-                          Approve
-                        </label>
+    setFormData({
+      ...formData,
+      approvalLevels: updated,
+    });
+  }}
+>
+  <option value="">+ Assign User</option>
 
-                        <label>
-                          <input type="checkbox" />
-                          Reject
-                        </label>
 
-                        <label>
-                          <input type="checkbox" />
-                          Hold
-                        </label>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+</select>
+      </td>
+
+      <td className="px-6 py-4">
+  <div className="flex items-center gap-6">
+        <label className="flex items-center gap-2 text-gray-700 font-medium">
+          <input
+            type="checkbox"
+            
+            checked={item.canApprove}
+            onChange={(e) => {
+              const updated = [...formData.approvalLevels];
+              updated[index].canApprove = e.target.checked;
+
+              setFormData({
+                ...formData,
+                approvalLevels: updated,
+              });
+            }}
+            className="w-4 h-4 accent-[#A21CAF]"
+
+          />
+          Approve
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={item.canReject}
+            onChange={(e) => {
+              const updated = [...formData.approvalLevels];
+              updated[index].canReject = e.target.checked;
+
+              setFormData({
+                ...formData,
+                approvalLevels: updated,
+              });
+            }}
+            className="w-4 h-4 accent-[#A21CAF]"
+
+          />
+          Reject
+        </label>
+
+        <label className="flex items-center gap-2 text-gray-700 font-medium">
+  <input
+    type="checkbox"
+    checked={item.canHold}
+    onChange={(e) => {
+      const updated = [...formData.approvalLevels];
+      updated[index].canHold = e.target.checked;
+
+      setFormData({
+        ...formData,
+        approvalLevels: updated,
+      });
+    }}
+    className="w-4 h-4 accent-[#A21CAF]"
+  />
+  Hold
+</label>
+</div>
+      </td>
+    </tr>
+  ))}
+</tbody>
               </table>
 
               <div className="mb-6">
-  <label className="text-sm text-gray-600 block mb-2">
+  <label className="block mb-2 text-sm font-semibold text-gray-800">
     Attachment
   </label>
 
@@ -302,8 +433,7 @@ const handleSubmit = async () => {
     type="file"
     accept=".pdf,.doc,.docx"
     onChange={(e) => setAttachment(e.target.files[0])}
-    className="w-full border rounded-lg px-3 py-2"
-  />
+className="w-full rounded-lg border border-[#D1D5DB] px-4 py-3 text-[14px] text-[#374151] focus:ring-2 focus:ring-[#F4D4FB] focus:border-[#A21CAF] outline-none resize-none"  />
 
   {attachment && (
     <p className="text-sm text-green-600 mt-2">
@@ -313,13 +443,13 @@ const handleSubmit = async () => {
 </div>
 
               <div className="flex justify-end gap-3 mt-8">
-                <button className="border px-5 py-2 rounded-lg">
+                <button className="px-6 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100">
                   Cancel
                 </button>
 
                 <button
   onClick={handleSubmit}
-  className="bg-[#7A008C] text-white px-5 py-2 rounded-lg"
+  className="px-8 py-3 rounded-xl bg-[#8B0EA9] hover:bg-[#6E0C86] text-white font-semibold shadow-md hover:bg-[#62006f] transition"
 >
   Create Approval
 </button>

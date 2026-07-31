@@ -18,7 +18,7 @@ export async function POST(req) {
       },
       data: {
         password: hashedPassword,
-      },
+      },  
     });
 
     return Response.json({

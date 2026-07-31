@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-// GET PRODUCTS
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
@@ -28,7 +27,6 @@ export async function GET() {
   }
 }
 
-// CREATE PRODUCT
 export async function POST(req) {
   try {
     const formData = await req.formData();
@@ -44,7 +42,6 @@ export async function POST(req) {
         ? specificationFile.name
         : "";
 
-    // duplicate code check
     const existingProduct = await prisma.product.findUnique({
       where: {
         productCode,

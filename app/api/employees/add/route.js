@@ -5,53 +5,61 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
+    if (!body.designationId) {
+      return NextResponse.json(
+        { error: "designationId is required" },
+        { status: 400 }
+      );
+    }
+
     const user = await prisma.users.create({
-  data: {
-    name: body.name || null,
+      data: {
+        name: body.name,
+        password: body.password || "123456",
 
-    password: body.password || "123456",
+        designation: {
+          connect: {
+            id: Number(body.designationId),
+          },
+        },
 
-    userid: body.userid || null,
-    workemail: body.workemail || null,
-    personalemail: body.personalemail || null,
-    phone: body.phone || null,
+        userid: body.userid,
+        workemail: body.workemail,
+        personalemail: body.personalemail,
+        phone: body.phone,
 
-    dob: body.dob ? new Date(body.dob) : null,
+        dob: new Date(body.dob),
 
-    gender: body.gender || null,
+        gender: body.gender,
 
-    present_address: body.presentAddress || null,
-    permanent_address: body.permanentAddress || null,
+        present_address: body.presentAddress,
+        permanent_address: body.permanentAddress,
 
-    joining_date: body.joining_date
-      ? new Date(body.joining_date)
-      : null,
+        joining_date: new Date(body.joining_date),
 
-    team: body.team || null,
+        team: body.team,
+        manager: body.reporting_to,
+        department: body.department,
+        reporting_to: body.reporting_to,
+        employment_type: body.employment_type,
+        role: body.role,
 
-    manager: body.reporting_to || null,
+        aadhaar: body.aadhaar,
+        pan: body.pan,
+        passport: body.passport,
 
-    department: body.department || null,
+        offer_letter: body.offer_letter || "",
+        increment_document: body.increment_document || "",
+      },
+      include: {
+        designation: true,
+      },
+    });
 
-    reporting_to: body.reporting_to || null,
-
-    employment_type: body.employment_type || null,
-
-    role: body.role || null,
-
-    aadhaar: body.aadhaar || null,
-    pan: body.pan || null,
-    passport: body.passport || null,
-
-    offer_letter: body.offer_letter || "",
-    increment_document: body.increment_document || "",
-  },
-});
-
-    return NextResponse.json(user);
+    return NextResponse.json(user, { status: 201 });
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return NextResponse.json(
       {

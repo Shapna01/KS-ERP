@@ -7,10 +7,13 @@ export default async function AssignTeamPage({ params }) {
   const { id } = await params;
 
   const project = await prisma.project.findUnique({
-    where: {
-      id: Number(id),
-    },
-  });
+  where: {
+    id: Number(id),
+  },
+  include: {
+    purchaseRequisitions: true,
+  },
+});
 
   if (!project) {
     return <div>Project not found</div>;

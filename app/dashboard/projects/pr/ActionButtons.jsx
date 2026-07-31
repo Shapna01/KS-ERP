@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 export default function ActionButtons({ formData }) {
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const saveDraft = async () => {
     try {
       setLoading(true);      
@@ -17,7 +17,12 @@ export default function ActionButtons({ formData }) {
   };
 
 const submitPR = async () => {
-  if (!formData.expectedDeliveryDate) {
+  if (!formData?.projectId) {
+    alert("Project is required");
+    return;
+  }
+
+  if (!formData?.expectedDeliveryDate) {
     alert("Please select Expected Delivery Date");
     return;
   }
@@ -30,16 +35,23 @@ const submitPR = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        ...formData,
+        projectId: Number(formData.projectId), 
+      }),
     });
 
     const data = await res.json();
 
-    if (res.ok) {
-      alert("Purchase Requisition Submitted Successfully");
-    } else {
-      alert(data.error);
+    if (!res.ok) {
+      throw new Error(data?.error || "Request failed");
     }
+
+    alert("Purchase Requisition Submitted Successfully");
+    router.push(`/dashboard/projects/${formData.projectId}`);
+  } catch (err) {
+    console.error("submitPR error:", err.message);
+    alert(err.message);
   } finally {
     setLoading(false);
   }
@@ -67,7 +79,7 @@ disabled:opacity-50"      >
 
       <button
         type="button"
-        onClick={submitPR}
+        onClick={submitPR} 
         disabled={loading}
 className="bg-[#7A008C] text-white px-8 py-3 rounded-2xl
 shadow-md hover:bg-[#66006f]

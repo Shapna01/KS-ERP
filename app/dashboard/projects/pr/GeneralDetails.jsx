@@ -25,7 +25,7 @@ export default function GeneralDetails({ formData, updateField }) {
 
           <input
             type="text"
-            value={formData.projectNumber}
+            value={formData.projectId}
             readOnly
             className="w-full h-11 border rounded-md px-3 bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
           />

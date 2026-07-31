@@ -114,19 +114,7 @@ const [endDate, setEndDate] = useState("");
                 <input
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  className="
-w-full h-12 px-4 mt-2
-border border-gray-200
-rounded-2xl
-bg-gray-50
-text-black
-placeholder:text-gray-400
-focus:bg-white
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-transition
-"
+                  className="w-full h-12 px-4 mt-2 border border-gray-200 rounded-2xl bg-gray-50 text-black placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#7A008C] outline-none transition"
                 />
               </div>
 
@@ -139,19 +127,7 @@ transition
                   value={projectCode}
                   onChange={(e) => setProjectCode(e.target.value)}
                   placeholder="Enter Project Number"
-className="
-w-full h-12 px-4 mt-2
-border border-gray-200
-rounded-2xl
-bg-gray-50
-text-black
-placeholder:text-gray-400
-focus:bg-white
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-transition
-"                />
+                  className="w-full h-12 px-4 mt-2 border border-gray-200 rounded-2xl bg-gray-50 text-black placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#7A008C] outline-none transition"                />
               </div>
 
               <div>
@@ -164,61 +140,26 @@ transition
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-className="
-w-full h-12 px-4 mt-2
-border border-gray-200
-rounded-2xl
-bg-gray-50
-text-black
-placeholder:text-gray-400
-focus:bg-white
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-transition
-"                  />
+                    className=" w-full h-12 px-4 mt-2 border border-gray-200 rounded-2xl bg-gray-50 text-black placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#7A008C] outline-none transition"                  />
 
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-className="
-w-full h-12 px-4 mt-2
-border border-gray-200
-rounded-2xl
-bg-gray-50
-text-black
-placeholder:text-gray-400
-focus:bg-white
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-transition
-"                  />
+                    className="w-full h-12 px-4 mt-2 border border-gray-200 rounded-2xl bg-gray-50 text-black placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#7A008C] outline-none transition"                  />
                 </div>
               </div>
             </div>
 
             <div className="bg-gray-50 border border-gray-100 rounded-3xl p-8">
-  <h2 className="text-xl font-semibold text-gray-800 mb-6">
-    Project Description
-  </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Project Description
+            </h2>
 
- <textarea
-rows={5}
-className="
-w-full
-bg-white
-border border-gray-200
-rounded-2xl
-p-5
-text-black
-placeholder:text-gray-400
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-"
-/>
+            <textarea 
+            rows={5} 
+            className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-black placeholder:text-gray-400 focus:ring-2 focus:ring-[#7A008C] outline-none"
+            />
 
             <div className="border border-gray-200 rounded-2xl p-8 mt-8">
 
@@ -228,15 +169,17 @@ outline-none
 
               <div className="grid  md:grid-cols-2 gap-8">
 
-<div className="
-border-2 border-dashed
-border-[#D8B4FE]
-rounded-3xl
-bg-purple-50
-p-12
-flex flex-col items-center
-justify-center
-">                <p className="font-medium text-black">
+              <div className="
+              border-2 border-dashed
+              border-[#D8B4FE]
+              rounded-3xl
+              bg-purple-50
+              p-12
+              flex flex-col items-center
+              justify-center
+              ">                
+              
+              <p className="font-medium text-black">
                   Upload Project Document
                 </p>
 
@@ -255,20 +198,11 @@ justify-center
                 />
 
                <label
-htmlFor="project-file"
-className="
-mt-5
-bg-[#7A008C]
-text-white
-px-6 py-3
-rounded-xl
-cursor-pointer
-hover:bg-purple-900
-transition
-"
->
-Browse Files
-</label>
+                htmlFor="project-file"
+                className="mt-5 bg-[#7A008C] text-white px-6 py-3 rounded-xl cursor-pointer hover:bg-purple-900 transition "
+                >
+                Browse Files
+                </label>
 
                 {files.length > 0 && (
                   <p className="mt-3 text-sm text-green-600">
@@ -289,27 +223,27 @@ Browse Files
             </div>
             </div>
             <div className="space-y-2 mt-6">
-  {files.length > 0 ? (
-    files.map((file, index) => (
-      <div
-        key={index}
-        className="border rounded-lg p-3 flex items-center justify-between"
-      >
-        <span>{file.name}</span>
+            {files.length > 0 ? (
+              files.map((file, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-3 flex items-center justify-between"
+                >
+                  <span>{file.name}</span>
 
-        <span className="text-xs text-gray-500">
-          {(file.size / 1024).toFixed(2)} KB
-        </span>
-      </div>
-    ))
-  ) : (
-    <div className="border rounded-lg p-3 text-gray-400">
-      No file selected
-    </div>
-  )}
-</div>
+                  <span className="text-xs text-gray-500">
+                    {(file.size / 1024).toFixed(2)} KB
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="border rounded-lg p-3 text-gray-400">
+                No file selected
+              </div>
+            )}
+          </div>
 
-</div>
+          </div>
 
             </div>
 
@@ -346,24 +280,23 @@ Browse Files
                   onChange={(e) =>
                     setProjectManager(e.target.value)
                   }
-                  className="
-w-full h-12 px-4 mt-2
-border border-gray-300
-rounded-xl
-text-black
-focus:ring-2
-focus:ring-[#7A008C]
-outline-none
-"
-                >
+                  className="w-full h-12 px-4 mt-2
+                    border border-gray-300
+                    rounded-xl
+                    text-black
+                    focus:ring-2
+                    focus:ring-[#7A008C]
+                    outline-none
+                    "
+                                    >
                   <option>Rohan Ramaswamy</option>
-                  <option>John Smith</option>
+                  <option>John Smith</option>  
                 </select>
               </div>
 
             </div>
 
-<div className="flex justify-end gap-5 mt-10 pt-8 border-t border-gray-100">
+            <div className="flex justify-end gap-5 mt-10 pt-8 border-t border-gray-100">
               <button
                 onClick={() => router.push("/dashboard/projects")}
                 className="
@@ -394,15 +327,11 @@ outline-none
               </button>
 
             </div> 
-
-
-
-
-</div>
+            </div>
           </div>
 
         </div>
       </div>
     </div>
   );
-}
+}  

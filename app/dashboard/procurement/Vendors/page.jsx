@@ -1,107 +1,194 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+"use client";
 
-export default async function VendorsPage() {
-  const vendors = await prisma.vendor.findMany({
-    orderBy: {
-      vendorName: "asc",
-    },
-  });
+import { useEffect, useState } from "react";
+import Sidebar from "../../users/components/Sidebar";
+import Topbar from "../../users/components/Topbar";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import ProcurementSidebar from "../components/ProcurementSidebar";
+export default function VendorPage() {
+  const [vendors, setVendors] = useState([]);
+
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const fetchVendors = async () => {
+    try {
+      const res = await fetch("/api/vendor");
+      const data = await res.json();
+      setVendors(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <div className="p-8 bg-[#F7F7FA] min-h-screen">
+    <div className="flex min-h-screen bg-[#F7F7FA]">
+      <Sidebar />
+<ProcurementSidebar />
+      <div className="flex-1 flex flex-col ml-[74px]">
+        <Topbar />
 
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-[#7A008C]">
-            Vendors Master
-          </h1>
+        <div className="flex-1 overflow-y-auto pt-[100px] ml-[250px] px-8 py-7">
 
-          <p className="text-sm text-gray-500 mt-2">
-            Manage all vendors and their details.
-          </p>
-        </div>
+          <div className="text-sm mb-6 text-gray-500">
+            <span className="text-[#7A008C] font-medium">
+              Procurement
+            </span>
+            <span className="mx-2">{">"}</span>
+            <span>Vendors Master</span>
+          </div>
 
-        <Link
-          href="/dashboard/procurement/vendors/create"
-          className="bg-[#7A008C] hover:bg-purple-500 text-white px-5 py-2 rounded-lg"
-        >
-          + Create New   
-        </Link>
-      </div>
+          <div className="flex justify-between items-center mb-8">
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <div>
+              <h1 className="text-4xl font-bold text-[#7A008C]">
+                Vendor Master
+              </h1>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-lg">
-            Vendor Details ({vendors.length})
-          </h2>
+              <p className="text-sm text-gray-500 mt-2">
+                Centralized list of vendors and their details.
+              </p>
+            </div>
 
-          <input
-            type="text"
-            placeholder="Search"
-            className="border border-gray-200 rounded-lg px-4 py-2 w-[250px] focus:outline-none"
-          />
-        </div>
+            <Link
+              href="/dashboard/procurement/vendors/create"
+              className="bg-[#7A008C] hover:bg-purple-900 text-white px-5 py-3 rounded-xl shadow-md transition"
+            >
+              + Create New
+            </Link>
 
-        <table className="w-full text-gray-500">
+          </div>
 
-          <thead className="bg-gray-50 text-gray-700">
-            <tr>
-              <th className="p-3 text-left">S.NO</th>
-              <th className="p-3 text-left">Vendor Name</th>
-              <th className="p-3 text-left">Address</th>
-              <th className="p-3 text-left">Contact Mail</th>
-              <th className="p-3 text-left">Contact No</th>
-              <th className="p-3 text-left">GST Number</th>
-              <th className="p-3 text-left">Account Details</th>
-              <th className="p-3 text-left">Action</th>
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
 
-            </tr>
-          </thead>
+            <div className="flex justify-between items-center mb-6">
 
-          <tbody>
-            {vendors.map((vendor, index) => (
-              <tr
-                key={vendor.id}
-                className="border-b border-[#E5E7EB] text-sm hover:bg-[#FAFAFA]"
-              >
-                <td className="p-4">{index + 1}</td>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Vendor Details
+                </h2>
 
-                <td className="p-4 font-medium">
-                  {vendor.vendorName}
-                </td>
+                <p className="text-sm text-gray-500 mt-1">
+                  Total Vendors : {vendors.length}
+                </p>
+              </div>
 
-                <td className="p-4">
-                  {vendor.address}
-                </td>
+              <div className="relative">
 
-                <td className="p-4">
-                  {vendor.primaryContactMail}
-                </td>
+                <Search
+                  size={18}
+                  className="absolute left-3 top-3 text-gray-400"
+                />
 
-                <td className="p-4">
-                  {vendor.primaryContactNumber}
-                </td>
+                <input
+                  type="text"
+                  placeholder="Search vendor..."
+                  className="w-[280px] h-11 pl-10 pr-4 border border-gray-300 rounded-xl outline-none focus:border-[#7A008C]"
+                />
 
-                <td className="p-4">
-                  {vendor.gstNumber}
-                </td>
+              </div>
 
-                <td className="p-4">
-                  <div>{vendor.bankName}</div>
-                  <div className="text-gray-500 text-xs">
-                    {vendor.accountNumber}
+            </div>
+
+            <div className="overflow-x-auto border border-gray-200 rounded-2xl">
+
+              <table className="w-full text-sm">
+
+                <thead className="bg-gray-100 text-gray-700">
+                  <tr>
+                    <th className="p-4 text-left">S.NO</th>
+                    <th className="p-4 text-left">Vendor Name</th>
+                    <th className="p-4 text-left">Address</th>
+                    <th className="p-4 text-left">Contact Mail</th>
+                    <th className="p-4 text-left">Contact No</th>
+                    <th className="p-4 text-left">GST Number</th>
+                    <th className="p-4 text-left">Account Details</th>
+                    <th className="p-4 text-left">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {vendors.map((vendor, index) => (
+                    <tr
+                      key={vendor.id}
+                      className="border-b border-gray-200 hover:bg-purple-50 transition"
+                    >
+                      <td className="p-4 text-gray-600">
+                        {index + 1}
+                      </td>
+
+                      <td className="p-4 font-medium text-gray-800">
+                        {vendor.vendorName}
+                      </td>
+
+                      <td className="p-4 text-gray-600">
+                        {vendor.address || "-"}
+                      </td>
+
+                      <td className="p-4 text-gray-600">
+                        {vendor.contactEmail || "-"}
+                      </td>
+
+                      <td className="p-4 text-gray-600">
+                       {vendor.contactNumber || "-"}
+                      </td>
+
+                      <td className="p-4 text-gray-600">
+                        {vendor.gstNumber || "-"}
+                      </td>
+
+                      <td className="p-4">
+                      <div className="bg-purple-50 text-[#7A008C] px-3 py-2 rounded-lg inline-block">
+                        <div className="text-sm">
+                          <div>{vendor.bankName || "-"}</div>
+
+                          <div className="text-xs text-gray-500">
+                            {vendor.accountNumber || "-"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  <td className="p-4">
+                <div className="flex gap-3">
+                <Link href={`/dashboard/procurement/vendors/${vendor.id}`}>
+
+                View
+                </Link>
+
+                <Link href={`/dashboard/procurement/vendors/edit/${vendor.id}`}>
+                  Edit
+                </Link>
+
+               
                   </div>
                 </td>
-              </tr>
-            ))}
-          </tbody>
+                    </tr>
+                  ))}
 
-        </table>
+                  {vendors.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="8"
+                        className="text-center p-8 text-gray-400"
+                      >
+                        No vendors found
+                      </td>
+                    </tr>
+                  )}
 
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </div>
       </div>
-
     </div>
   );
 }

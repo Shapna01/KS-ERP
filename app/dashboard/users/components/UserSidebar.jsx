@@ -28,23 +28,23 @@ export default function UserSidebar() {
       path: "/dashboard/users/designations",
     },
   ];
-  
+
   return (
     <div className="fixed top-[72px] left-[74px] w-[250px] h-[calc(100vh-72px)] bg-white border-r border-[#EAECF0] overflow-y-auto">
       <div className="px-8 py-7 border-b">
-        <h1 className="text-[24px] text-black font-semibold">
-          Users
-        </h1>
+        <h1 className="text-[24px] font-semibold">Users</h1>
       </div>
 
       <div className="pt-3">
         {menus.map((menu) => {
-          const active = pathname === menu.path;
+          const active =
+            pathname === menu.path ||
+            pathname.startsWith(menu.path + "/");
 
           return (
             <Link key={menu.path} href={menu.path}>
               <div
-                className={`relative h-[54px] flex items-center px-8 text-[14px] cursor-pointer
+                className={`relative h-[54px] flex items-center px-8 text-[14px]
                 ${
                   active
                     ? "bg-[#FDF2FA] text-[#101828] font-medium"
@@ -54,7 +54,6 @@ export default function UserSidebar() {
                 {active && (
                   <div className="absolute left-0 top-0 h-full w-[4px] bg-[#C11574]" />
                 )}
-
                 {menu.name}
               </div>
             </Link>

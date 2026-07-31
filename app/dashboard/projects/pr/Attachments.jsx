@@ -125,7 +125,7 @@ export default function Attachments() {
                     >
                       <X
                         size={16}
-                        className="text-red-500 hover:text-red-600 transition cursor-pointer"
+                        className="text-red-500 hover:text-red-600 transition cursor-pointer" 
                       />
                     </button>
 

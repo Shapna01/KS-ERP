@@ -10,39 +10,41 @@ datasource db {
 model designations {
   id              Int     @id @default(autoincrement())
   name            String
-  description     String?
-  team_associated String?
-  department      String?
-  department_head String?
-  users           users[]
+  description     String
+  team_associated String
+  department      String
+  department_head String
+  users           users[] 
 }
 
 model users {
-  id                 Int           @id @default(autoincrement())
-  password           String        @db.VarChar(255)
-  name               String        @db.VarChar(255)
-  designationId      Int?
-  team               String        @db.VarChar(255)
-  manager            String        @db.VarChar(255)
-  role               String        @db.VarChar(255)
-  phone              String        @db.VarChar(20)
-  joining_date       DateTime?     @db.Date
+  id                 Int             @id @default(autoincrement())
+  password           String          @db.VarChar(255)
+  name               String          @db.VarChar(255)
+  designationId      Int
+  team               String          @db.VarChar(255)
+  manager            String          @db.VarChar(255)
+  role               String          @db.VarChar(255)
+  phone              String          @db.VarChar(20)
+  joining_date       DateTime        @db.Date
   offer_letter       String
   increment_document String
-  userid             String        @db.VarChar(255)
-  workemail          String        @db.VarChar(255)
-  personalemail      String        @db.VarChar(255)
-  dob                DateTime      @db.Date
-  gender             String        @db.VarChar(50)
+  userid             String          @db.VarChar(255)
+  workemail          String          @db.VarChar(255)
+  personalemail      String          @db.VarChar(255)
+  dob                DateTime        @db.Date
+  gender             String          @db.VarChar(50)
   present_address    String
   permanent_address  String
-  department         String        @db.VarChar(255)
-  reporting_to       String        @db.VarChar(255)
-  employment_type    String        @db.VarChar(255)
-  aadhaar            String        @db.VarChar(50)
-  pan                String        @db.VarChar(50)
-  passport           String        @db.VarChar(50)
-  designation        designations? @relation(fields: [designationId], references: [id])
+  department         String          @db.VarChar(255)
+  reporting_to       String          @db.VarChar(255)
+  employment_type    String          @db.VarChar(255)
+  aadhaar            String          @db.VarChar(50)
+  pan                String          @db.VarChar(50)
+  passport           String          @db.VarChar(50)
+  designation        designations?   @relation(fields: [designationId], references: [id])
+  approvalLevels     ApprovalLevel[]
+  reimbursements     Reimbursement[]
 }
 
 model roles {
@@ -55,13 +57,40 @@ model roles {
 }
 
 model Approval {
-  id          Int      @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
-  description String?
+  description String
   module      String
   levels      Int
-  status      String
-  createdAt   DateTime @default(now())
+
+  approvalType String
+  amountBased  Boolean @default(false)
+
+  notifyApp  Boolean @default(true)
+  notifyMail Boolean @default(false)
+
+  status String
+
+  createdAt DateTime @default(now())
+
+  approvalLevels ApprovalLevel[]
+}
+
+model ApprovalLevel {
+  id Int @id @default(autoincrement())
+
+  approvalId Int
+  level      Int
+
+  approverId Int?
+
+  canApprove Boolean @default(false)
+  canReject  Boolean @default(false)
+  canHold    Boolean @default(false)
+
+  approval Approval @relation(fields: [approvalId], references: [id])
+
+  approver users? @relation(fields: [approverId], references: [id])
 }
 
 model Project {
@@ -69,22 +98,24 @@ model Project {
 
   projectName        String
   projectCode        String
-  projectDescription String?
+  projectDescription String
 
-  estimatedBudget Float?
+  estimatedBudget Float
   projectManager  String
 
-  startDate DateTime?
-  endDate   DateTime?
+  startDate DateTime
+  endDate   DateTime
 
   approvalStatus String @default("Yet to Approve")
+  projectStatus  String @default("Pending")
 
-  projectStatus String @default("Pending")
+  purchaseRequisitions PurchaseRequisition[]
+  purchaseOrders       PurchaseOrder[]
+  rfqs                 RFQ[]
 
-  createdAt DateTime @default(now())
+  createdAt      DateTime        @default(now())
+  reimbursements Reimbursement[]
 }
-
-
 
 model ProductVendor {
   id Int @id @default(autoincrement())
@@ -99,60 +130,404 @@ model ProductVendor {
 }
 
 model PurchaseRequisition {
-  id                   Int       @id @default(autoincrement())
-  prNumber             String    @unique
-  projectNumber        String
+  id       Int    @id @default(autoincrement())
+  prNumber String @unique
+
+  projectId Int
+
   category             String
   priority             String
   deliveryAddress      String
   requestorDept        String
-  expectedDeliveryDate DateTime?
+  expectedDeliveryDate DateTime
   reason               String
-  status               String    @default("Pending")
-  createdAt            DateTime  @default(now())
+
+  status String @default("Pending")
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  items PurchaseRequisitionItem[]
+
+  rfqs RFQ[]
+
+  createdAt DateTime @default(now())
 }
 
 model Product {
-  id             Int      @id @default(autoincrement())
+  id             Int    @id @default(autoincrement())
   productName    String
-  productCode    String   @unique
-  specification  String?
-  estimatedPrice Float?
+  productCode    String @unique
+  specification  String
+  estimatedPrice Float
 
-  createdAt      DateTime @default(now())
-  productVendors ProductVendor[]
+  createdAt                DateTime                  @default(now())
+  productVendors           ProductVendor[]
+  purchaseOrderItems       PurchaseOrderItem[]
+  purchaseRequisitionItems PurchaseRequisitionItem[]
+  vendorQuotations         VendorQuotation[]
+
+  rfqItems RFQItem[]
 }
 
 model Vendor {
   id Int @id @default(autoincrement())
 
-  // Company Details
   vendorName      String
   establishedDate DateTime?
-  panNumber       String?
-  gstNumber       String?
-  serviceCategory String?
-  legalStructure  String?
-  annualSales     String?
-  msmeRegistered  String?
-  address         String?
+  panNumber       String
+  gstNumber       String
+  serviceCategory String
+  legalStructure  String
+  annualSales     String
+  msmeRegistered  String
+  address         String
 
-  // Contact Details
-  contactName     String?
-  contactNumber   String?
-  contactEmail    String?
-  fax             String?
-  website         String?
-  upiId           String?
+  contactName   String
+  contactNumber String
+  contactEmail  String
+  fax           String
+  website       String
+  upiId         String
 
-  // Account Details
-  beneficiaryName String?
-  accountNumber   String?
-  bankName        String?
-  branchName      String?
-  ifscCode        String?
+  beneficiaryName String
+  accountNumber   String
+  bankName        String
+  branchName      String
+  ifscCode        String
 
   products ProductVendor[]
 
+  purchaseOrders PurchaseOrder[]
+
+  rfqs RFQVendor[]
+
+  quotations VendorQuotation[]
+
   createdAt DateTime @default(now())
+}
+
+model PurchaseRequisitionItem {
+  id Int @id @default(autoincrement())
+
+  purchaseRequisitionId Int
+  productId             Int
+
+  quantity      Int
+  estimatedRate Float
+
+  purchaseRequisition PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
+  product             Product             @relation(fields: [productId], references: [id])
+}
+
+model PurchaseOrder {
+  id Int @id @default(autoincrement())
+
+  poNumber String @unique
+
+  vendorId  Int
+  projectId Int
+  rfqId     Int
+
+  orderDate            DateTime
+  expectedDeliveryDate DateTime
+
+  type   String @default("One-time")
+  status String @default("Purchase Order")
+
+  paymentMethod        String @default("schedule")
+  advancePercent       Float  @default(40)
+  installmentPercent   Float  @default(60)
+  modeOfPayment        String @default("Online Transfer")
+  numberOfInstallments Int    @default(3)
+  paymentFrequency     String @default("Monthly")
+
+  vendor  Vendor  @relation(fields: [vendorId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+  rfq     RFQ     @relation(fields: [rfqId], references: [id])
+
+  items PurchaseOrderItem[]
+
+  goodsReceipts GoodsReceipt[]
+
+  paymentSchedules PaymentSchedule[]
+
+  invoices Invoice[]
+
+  payments Payment[]
+
+  totalAmount Float @default(0)
+
+  paymentTerms    String?
+  invoiceNumber   String?
+  invoiceDate     DateTime?
+  deliveryAddress String?
+  billingAddress  String?
+
+  createdAt DateTime @default(now())
+}
+
+model PaymentSchedule {
+  id Int @id @default(autoincrement())
+
+  purchaseOrderId Int
+
+  paymentName String
+  dueDate     DateTime
+  amount      Float
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+}
+
+model PurchaseOrderItem {
+  id Int @id @default(autoincrement())
+
+  purchaseOrderId Int
+  productId       Int
+
+  quantity  Int
+  unitPrice Float
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+
+  goodsReceiptItems GoodsReceiptItem[]
+}
+
+model RFQ {
+  id Int @id @default(autoincrement())
+
+  rfqNumber String @unique
+
+  purchaseRequisitionId Int
+  projectId             Int
+
+  deliveryCharge            String?
+  deliveryType              String?
+  returnResponsibility      String?
+  replacementResponsibility String?
+
+  submittedAt DateTime?
+
+  purchaseRequisition PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  vendors RFQVendor[]
+
+  items RFQItem[]
+
+  quotations VendorQuotation[]
+
+  purchaseOrders PurchaseOrder[]
+
+  status String @default("Draft")
+
+  createdAt DateTime @default(now())
+}
+
+model RFQVendor {
+  id Int @id @default(autoincrement())
+
+  rfqId Int
+
+  vendorId Int
+
+  rfq RFQ @relation(fields: [rfqId], references: [id])
+
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+
+  @@unique([rfqId, vendorId])
+}
+
+model VendorQuotation {
+  id Int @id @default(autoincrement())
+
+  rfqId     Int
+  vendorId  Int
+  productId Int
+
+  costPerUnit Float
+
+  quantity Int
+
+  expectedDeliveryDate DateTime
+
+  totalCost Float
+
+  includeDeliveryCharge Boolean
+
+  returnAvailable Boolean
+
+  replacementAvailable Boolean
+
+  isSelected Boolean @default(false)
+
+  remarks String?
+
+  status String @default("Submitted")
+
+  rfq RFQ @relation(fields: [rfqId], references: [id])
+
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model RFQItem {
+  id Int @id @default(autoincrement())
+
+  rfqId     Int
+  productId Int
+
+  quantity      Int
+  estimatedRate Float
+
+  rfq RFQ @relation(fields: [rfqId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model GoodsReceiptItem {
+  id Int @id @default(autoincrement())
+
+  goodsReceiptId Int
+
+  purchaseOrderItemId Int
+
+  orderedQuantity  Int
+  receivedQuantity Int
+  acceptedQuantity Int
+  rejectedQuantity Int
+
+  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
+
+  purchaseOrderItem PurchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id])
+}
+
+model GoodsReceipt {
+  id Int @id @default(autoincrement())
+
+  purchaseOrderId Int
+
+  grnNumber String @unique
+
+  receivedDate DateTime
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  items    GoodsReceiptItem[]
+  invoices Invoice[]
+}
+
+model Invoice {
+  id Int @id @default(autoincrement())
+
+  purchaseOrderId Int
+  goodsReceiptId  Int?
+
+  invoiceNumber String
+  invoiceType   String
+
+  invoiceDate DateTime  @default(now())
+  dueDate     DateTime?
+
+  quantity Int
+  amount   Float
+
+  cgst Float @default(0)
+  sgst Float @default(0)
+  igst Float @default(0)
+
+  grandTotal Float @default(0)
+
+  paymentTerms  String?
+  paymentMethod String?
+
+  invoiceFile String?
+
+  financeRemarks String?
+
+  invoiceStatus String @default("Pending")
+
+  matchingStatus String?
+
+  createdAt DateTime @default(now())
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  purchaseOrderId Int
+
+  paymentDate DateTime
+
+  paymentMode String
+
+  referenceNo String?
+
+  amount Float
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+}
+
+model Reimbursement {
+  id Int @id @default(autoincrement())
+
+  claimId String @unique
+
+  userId Int
+  userName String
+
+  department String
+  team String
+
+  submissionDate DateTime
+  claimCategory String
+
+  amount Float
+  reason String?
+
+  status String @default("Submitted")
+  approvedAt DateTime?
+  managerRemarks String?
+
+  projectId Int
+
+  user users @relation(fields: [userId], references: [id])
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  receipts ReimbursementReceipt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reimbursements")
+}
+
+model ReimbursementReceipt {
+  id Int @id @default(autoincrement())
+
+  reimbursementId Int
+
+  fileUrl String
+
+  reimbursement Reimbursement @relation(fields: [reimbursementId], references: [id], onDelete: Cascade)
 }

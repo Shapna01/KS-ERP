@@ -9,8 +9,11 @@ export async function GET() {
       },
     });
 
+    console.log("Users from DB:", users);
+
     return NextResponse.json(users);
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

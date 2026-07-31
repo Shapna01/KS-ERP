@@ -14,7 +14,7 @@ export default function ProjectsPage() {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [activeTab, setActiveTab] = useState("All");
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -33,18 +33,60 @@ export default function ProjectsPage() {
   }
 
   useEffect(() => {
-    const filtered = projects.filter((project) => {
-      const search = searchTerm.toLowerCase();
+  let filtered = [...projects];
 
-      return (
-        project.projectName?.toLowerCase().includes(search) ||
-        project.projectDescription?.toLowerCase().includes(search) ||
-        project.projectCode?.toLowerCase().includes(search)
+  if (searchTerm) {
+    const search = searchTerm.toLowerCase();
+
+    filtered = filtered.filter((project) =>
+      project.projectName?.toLowerCase().includes(search) ||
+      project.projectDescription?.toLowerCase().includes(search) ||
+      project.projectCode?.toLowerCase().includes(search)
+    );
+  }
+
+  if (activeTab !== "All") {
+    if (activeTab === "Pending") {
+      filtered = filtered.filter(
+        (p) =>
+          p.approvalStatus === "Pending" ||
+          p.approvalStatus === "Yet to Approve"
       );
-    });
+    } else if (activeTab === "Hold") {
+      filtered = filtered.filter(
+        (p) =>
+          p.approvalStatus === "Hold" ||
+          p.approvalStatus === "On Hold"
+      );
+    } else {
+      filtered = filtered.filter(
+        (p) => p.approvalStatus === activeTab
+      );
+    }
+  }
 
-    setFilteredProjects(filtered);
-  }, [searchTerm, projects]);
+  setFilteredProjects(filtered);
+}, [projects, searchTerm, activeTab]);
+
+  const counts = {
+  All: projects.length,
+  Approved: projects.filter(
+    (p) => p.approvalStatus === "Approved"
+  ).length,
+  Pending: projects.filter(
+    (p) =>
+      p.approvalStatus === "Pending" ||
+      p.approvalStatus === "Yet to Approve"
+  ).length,
+  Rejected: projects.filter(
+    (p) => p.approvalStatus === "Rejected"
+  ).length,
+  Hold: projects.filter(
+    (p) =>
+      p.approvalStatus === "Hold" ||
+      p.approvalStatus === "On Hold"
+  ).length,
+};
 
   return (
     <div className="flex min-h-screen bg-[#F7F7FA]">
@@ -68,7 +110,7 @@ export default function ProjectsPage() {
                 </h1>
 
                 <p className="text-sm text-gray-500 mt-2">
-                  Manage all projects.
+                  Allows administrators to design and manage approval workflows by specifying approval levels, approvers, escalation rules, and conditions such as amount, project, or department.
                 </p>
               </div>
 
@@ -82,38 +124,89 @@ export default function ProjectsPage() {
 
             <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 text-gray-500">
 
-              <div className="flex justify-between mb-6">
-                <h2 className="font-semibold text-2xl">
-                  Project Details ({filteredProjects.length})
-                </h2>
+<div className="mb-6">
+  <h2 className="font-semibold text-2xl text-black">
+    Project Details ({filteredProjects.length})
+  </h2>
+</div>
 
-                <div className="flex gap-3">
+<div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-6">
 
-                  <div className="relative">
-                    <Search
-                      size={16}
-                      className="absolute left-3 top-3 text-gray-400"
-                    />
+  <div className="flex items-center gap-6">
 
-                    <input
-                      value={searchTerm}
-                      onChange={(e) =>
-                        setSearchTerm(e.target.value)
-                      }
-                      placeholder="Search"
-                      className="h-11 w-64 border border-gray-300 rounded-xl pl-10 pr-4 outline-none focus:border-[#7A008C]"
-                    />
-                  </div>
+    {[
+      {
+        label: "All Projects",
+        value: "All",
+        count: counts.All,
+      },
+      {
+        label: "Approved",
+        value: "Approved",
+        count: counts.Approved,
+      },
+      {
+        label: "Yet to Approve",
+        value: "Pending",
+        count: counts.Pending,
+      },
+      {
+        label: "Rejected",
+        value: "Rejected",
+        count: counts.Rejected,
+      },
+      {
+        label: "On Hold",
+        value: "Hold",
+        count: counts.Hold,
+      },
+    ].map((tab) => (
+      <button
+        key={tab.value}
+        onClick={() => setActiveTab(tab.value)}
+        className={`relative pb-3 text-sm font-medium transition ${
+          activeTab === tab.value
+            ? "text-[#7A008C]"
+            : "text-gray-600 hover:text-[#7A008C]"
+        }`}
+      >
+        {tab.label} ({tab.count})
 
-                  <button className="w-11 h-11 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
-                    <Filter size={16} />
-                  </button>
+        {activeTab === tab.value && (
+          <span className="absolute left-0 bottom-[-13px] h-[2px] w-full bg-[#7A008C]" />
+        )}
+      </button>
+    ))}
 
-                  <button className="w-11 h-11 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
-                    <Upload size={16} />
-                  </button>
-                </div>
-              </div>
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <div className="relative">
+      <Search
+        size={16}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+      />
+
+      <input
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search"
+        className="w-60 h-10 rounded-lg border border-gray-300 pl-10 pr-4 text-sm outline-none focus:border-[#7A008C]"
+      />
+    </div>
+
+    <button className="w-10 h-10 border rounded-lg flex items-center justify-center hover:bg-gray-100">
+      <Filter size={16} />
+    </button>
+
+    <button className="w-10 h-10 border rounded-lg flex items-center justify-center hover:bg-gray-100">
+      <Upload size={16} />
+    </button>
+
+  </div>
+
+</div>
 
               <div className="overflow-hidden rounded-2xl border border-gray-200">
 
