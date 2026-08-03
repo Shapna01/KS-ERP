@@ -114,7 +114,7 @@ const fetchProducts = async () => {
                       className="border-b border-gray-100 hover:bg-gray-50 transition"
                     >
 
-                      <td className="p-3">
+                      <td className="p-3 text-black">
                         {index + 1}
                       </td>
 
@@ -127,7 +127,7 @@ const fetchProducts = async () => {
                       </Link>
                     </td>
 
-                      <td className="p-3">
+                      <td className="p-3 text-black">
                         {product.productCode}
                       </td>
 
@@ -135,11 +135,11 @@ const fetchProducts = async () => {
                         {product.specification || "-"}
                       </td>
 
-                      <td className="p-3">
+                      <td className="p-3 text-black">
                         ₹{product.estimatedPrice || 0}
                       </td>
 
-                      <td className="p-3">
+                      <td className="p-3 text-black">
                         {product.productVendors
                           ?.map((pv) => pv.vendor.vendorName)
                           .join(", ")}

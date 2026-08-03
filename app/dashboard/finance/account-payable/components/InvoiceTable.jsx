@@ -14,41 +14,41 @@ export default function InvoiceTable({
 
           <tr>
 
-            <th className="px-5 py-4 text-left">S.No</th>
+            <th className="px-5 py-4 text-left text-black">S.No</th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Invoice Number
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Type
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Amount
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               3-Way Matching
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Due Date
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Due Status
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               To Be Paid
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-black">
               Payment Status
             </th>
 
-            <th className="px-5 py-4 text-center">
+            <th className="px-5 py-4 text-center text-black">
               Actions
             </th>
 
@@ -67,7 +67,7 @@ export default function InvoiceTable({
                 className="border-t hover:bg-gray-50"
               >
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
                   {index + 1}
                 </td>
 
@@ -75,11 +75,11 @@ export default function InvoiceTable({
                   {invoice.invoiceNumber}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
                   {invoice.type}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
                   ₹
                   {Number(invoice.amount).toLocaleString(
                     "en-IN"
@@ -94,7 +94,7 @@ export default function InvoiceTable({
 
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
 
                   {invoice.dueDate
                     ? new Date(
@@ -104,13 +104,13 @@ export default function InvoiceTable({
 
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
 
                   {invoice.dueStatus}
 
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-gray-800">
 
                   {invoice.toBePaid
                     ? "Yes"

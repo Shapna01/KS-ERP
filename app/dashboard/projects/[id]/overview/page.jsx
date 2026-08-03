@@ -50,9 +50,21 @@ useEffect(() => {
 
 
 const fetchPRs = async () => {
-  const res = await fetch(`/api/projects/${id}/purchase-requisitions`);
-  const data = await res.json();
-  setRequisitions(data);
+  try {
+    const res = await fetch(`/api/projects/${id}/purchase-requisitions`);
+    const data = await res.json();
+
+    console.log("PR Response:", data);
+
+    setRequisitions(
+      Array.isArray(data)
+        ? data
+        : data.purchaseRequisitions || data.requisitions || []
+    );
+  } catch (error) {
+    console.error(error);
+    setRequisitions([]);
+  }
 };
 
  const duration =
@@ -281,10 +293,10 @@ shadow-sm
         <div className="mt-8 border-b border-[#EAECF0] flex gap-8">
   <button
     onClick={() => setActiveTab("team")}
-    className={`pb-4 text-[14px] font-medium transition ${
-activeTab==="team"
-? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
-: "text-[#667085] hover:text-[#7A008C]"
+   className={`pb-4 text-[14px] font-medium transition ${
+  activeTab==="requisitions"
+    ? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
+    : "text-[#667085]"
 }`}
   >
     Team Members ({members.length})
@@ -293,9 +305,9 @@ activeTab==="team"
   <button
     onClick={() => setActiveTab("requisitions")}
     className={`pb-4 text-[14px] font-medium transition ${
-activeTab==="team"
-? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
-: "text-[#667085] hover:text-[#7A008C]"
+  activeTab==="requisitions"
+    ? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
+    : "text-[#667085]"
 }`}
   >
     Purchase Requisitions ({requisitions.length})
@@ -304,9 +316,9 @@ activeTab==="team"
   <button
     onClick={() => setActiveTab("docs")}
     className={`pb-4 text-[14px] font-medium transition ${
-activeTab==="team"
-? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
-: "text-[#667085] hover:text-[#7A008C]"
+  activeTab==="requisitions"
+    ? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
+    : "text-[#667085]"
 }`}
   >
     Work Order Docs ({workOrderDocs.length})
@@ -315,10 +327,10 @@ activeTab==="team"
   <button
     onClick={() => setActiveTab("purchase")}
     className={`pb-4 text-[14px] font-medium transition ${
-    activeTab==="team"
+  activeTab==="requisitions"
     ? "text-[#7A008C] border-b-[3px] border-[#7A008C]"
-    : "text-[#667085] hover:text-[#7A008C]"
-    }`}
+    : "text-[#667085]"
+}`}
       >
     Purchase ({purchases.length})
   </button>
@@ -421,8 +433,9 @@ activeTab==="team"
       </thead>
 
         <tbody>
-  {requisitions.map((pr, index) => (
-    <tr key={pr.id} className="border-b">
+{Array.isArray(requisitions) &&
+  requisitions.map((pr, index) => (
+        <tr key={pr.id} className="border-b">
 
       <td className="px-5 py-4 text-[14px] text-[#344054]">{index + 1}</td>
 

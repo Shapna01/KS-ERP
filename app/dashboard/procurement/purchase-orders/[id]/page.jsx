@@ -14,7 +14,8 @@ export default function PurchaseOrderDetailsPage() {
   const [receivedItems, setReceivedItems] = useState([]);
   const [showClosePopup, setShowClosePopup] = useState(false);
   const [closeType, setCloseType] = useState("completed");
-  const [selectedGRN, setSelectedGRN] = useState(null);  
+  const [selectedGRN, setSelectedGRN] = useState(null); 
+  const [remarks, setRemarks] = useState({});
   const currentStage =
   po?.status?.trim() || "Purchase Order";
 
@@ -53,23 +54,48 @@ export default function PurchaseOrderDetailsPage() {
     }
 
     const data = await res.json();
+    console.log(data);
 
     setPo(data);
-   
+   setRemarks(
+  (data.goodsReceipts || []).reduce((acc, grn) => {
+    acc[grn.id] = grn.remarks || "";
+    return acc;
+  }, {})
+);
 setSelectedPaymentMethod(
   data.paymentMethod || "invoice"
 );
     setReceivedItems(
-      (data.items  || []).map((item) => ({
-        itemId: item.id,
-        productName: item.product?.productName || "",
-        ordered: item.quantity || 0,
-        received: 0,
-        accepted: 0,
-        rejected: 0,
-      }))
+  (data.items || []).map((item) => {
+    const alreadyReceived = (data.goodsReceipts || []).reduce(
+      (total, grn) => {
+        const row = (grn.items || []).find(
+          (x) => x.purchaseOrderItemId === item.id
+        );
+
+        return total + Number(row?.receivedQuantity || 0);
+      },
+      0
     );
 
+    const remaining = Math.max(
+      item.quantity - alreadyReceived,
+      0
+    );
+
+    return {
+      itemId: item.id,
+      productName: item.product?.productName || "",
+      ordered: item.quantity,
+      alreadyReceived,
+      remaining,
+      received: remaining,
+      accepted: remaining,
+      rejected: 0,
+    };
+  })
+)
     setAdvancePercent(data.advancePercent || 0);
     setModeOfPayment(
       data.modeOfPayment || "Online Transfer"
@@ -204,18 +230,20 @@ const currentIndex = steps.indexOf(currentStage);
 const buttonText = workflow[currentStage]?.buttonText;
 const generateGRN = async () => {
   try {
-    const updatedItems = receivedItems.map((item) => ({
-      purchaseOrderItemId: Number(item.itemId),
-
-      receivedQuantity: Number(item.ordered),
-
-      acceptedQuantity: Number(item.ordered),
-
-      rejectedQuantity: 0,
-    }));
+    const updatedItems = receivedItems
+  .filter((item) => item.remaining > 0)
+  .map((item) => ({
+    purchaseOrderItemId: item.itemId,
+    receivedQuantity: item.remaining,
+    acceptedQuantity: item.remaining,
+    rejectedQuantity: 0,
+  }));
 
     console.log("GRN ITEMS:", updatedItems);
-
+    if (updatedItems.length === 0) {
+  alert("All items have already been received. GRN cannot be generated.");
+  return;
+}
     const res = await fetch("/api/grn", {
       method: "POST",
       headers: {
@@ -306,1192 +334,789 @@ const handleClosePO = () => {
       <div className="flex-1 flex flex-col ml-[74px]">
         <Topbar />
 
-        <div className="flex-1 overflow-y-auto pt-[95px] px-10 pb-10 bg-gradient-to-br from-[#FCFAFE] via-[#F9FAFF] to-[#F4F5FF]">
-          <div className="flex items-center text-sm mb-8 font-medium">
+<div className="flex-1 overflow-y-auto pt-[100px] ml-[2px] px-8 py-7">
+    <div className="flex items-center text-sm mb-8 font-medium">
   <span className="text-[#7A008C]">
     Procurement
   </span>
 
-  <span className="mx-2">›</span>
+  <span className="mx-2 text-black">›</span>
 
   <span className="text-[#7A008C]">
     Purchase Orders
   </span>
 
-  <span className="mx-2">›</span>
+  <span className="mx-2 text-black">›</span>
 
   <span className="text-[#667085]">
     {po?.poNumber}
   </span>
 </div>
 
-<div className="flex items-center bg-white rounded-2xl border border-[#ECECEC] shadow-sm overflow-hidden mb-8">
-  {steps.map((step, index) => (
-    <div
-      key={index}
-     className={`flex-1 relative py-5 text-sm font-semibold transition-allduration-300
-${
-index <= currentIndex
-? "bg-gradient-to-r from-[#F8D8FF] to-[#FCEEFF] text-[#7A008C]"
-: "bg-white text-gray-400"
-}
-`}
-    >
-      {step}
-    </div>
-  ))}
-</div>
 
-<div className="bg-white rounded-[28px] border border-[#EFE7F7] shadow-lg shadow-[#7A008C]/5 hover:shadow-xl transition-all duration-300 p-8">
-
-  <div className="grid grid-cols-3 gap-5">
-
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Vendor *
-      </label>
-
-      <input
-        value={po.vendor?.vendorName || ""}
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none"/>
-    </div>
-
-    <div className="col-span-2">
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Vendor Address *
-      </label>
-
-      <input
-        value={po.vendor?.address || ""}
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none"
-      />
-    </div>
-
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Purchase Order Number
-      </label>
-
-      <input
-          value={po.poNumber || ""}
-
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none"/>
-    </div>
-
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        PR Number
-      </label>
-
-      <input
-        value={po.rfq?.purchaseRequisition?.prNumber || ""}
-        readOnly
-       className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none"/>
-    </div>
-
-    <div>
-      <label className="text-[12px]font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Project Number
-      </label>
-
-      <input
-        value={po.project?.projectCode || ""}
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none" />
-    </div>
-
-   
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Category
-      </label>
-
-      <input
-        value={po.rfq?.purchaseRequisition?.category || ""}
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none" />
-    </div>
-
-   
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Priority
-      </label>
-
-      <input
-        value={po.rfq?.purchaseRequisition?.priority || ""}
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px] text-[#344054] font-medium outline-none
-"
-      />
-    </div>
-
-    <div>
-      <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-        Expected Delivery Date
-      </label>
-
-      <input
-        value={
-          po.expectedDeliveryDate
-            ? new Date(
-                po.expectedDeliveryDate
-              ).toLocaleDateString()
-            : ""
-        }
-        readOnly
-        className="w-full h-12 rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 text-[14px]text-[#344054] font-medium outline-none
-"
-      />
-    </div>
-
-  </div>
-</div>
-<div className="mt-6">
-  <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block ">
-    Note for Vendors
-  </label>
-
-  <textarea
-    value={
-      po.rfq?.purchaseRequisition?.notesForVendor || ""
-    }
-    readOnly
-    rows={3}
-    className="w-full rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 py-3 text-[14px] text-[#344054] resize-none"/>
-</div>
-
-<div className="grid grid-cols-2 gap-5 mt-6">
-
+<div className="flex items-center justify-between mb-8 rounded-xl bg-white border border-[#EAECF0] shadow-sm p-6">
   <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Request Type
-    </label>
+    <h1 className="text-[30px] font-semibold text-[#101828]">
+      {po.poNumber}
+    </h1>
 
-    <input
-      value={po.requestType || ""}
-
-      readOnly
-      className="w-full h-11 border rounded-lg px-3 bg-gray-50"/>
+    <p className="mt-1 text-sm text-[#667085]">
+      Review Purchase Order details and submit for approval before issuing it to the vendor.
+    </p>
   </div>
 
-  <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Request Date
-    </label>
-
-    <input
-      value={
-        po.createdAt
-          ? new Date(
-              po.createdAt
-            ).toLocaleDateString()
-          : ""
-      }
-      readOnly
-      className="w-full h-11 border rounded-lg px-3 bg-gray-50
-      "
-    />
-  </div>
+  <button
+    className="h-10 rounded-md border border-[#D0D5DD] bg-white px-5 text-sm font-medium text-[#7A008C] hover:bg-[#FCFAFF]"
+  >
+    Audit Log
+  </button>
 
 </div>
 
-<div className="grid grid-cols-3 gap-5 mt-5">
+<div className="flex overflow-hidden rounded-lg border border-[#EAECF0]">
+  {steps.map((step, index) => {
+    const active = index <= currentIndex;
+
+    return (
+      <div
+        key={step}
+        className={`flex-1 py-4 text-center text-xs font-semibold transition-all duration-200 ${
+          active
+            ? "bg-[#7A008C] text-white"   
+            : "bg-[#F2F4F7] text-[#667085]" 
+        }`}
+      >
+        {step}
+      </div>
+    );
+  })}
+</div>
+
+<br /><br />
+<div className="mb-8 rounded-xl border border-[#E4E7EC] bg-white shadow-sm px-6 py-5">
+  <span className="text-xs text-[#667085]">
+
+    <span className="font-semibold">Note:</span>{" "}
+    Track all invoices and GRNs linked to this Purchase Order here.
+    Financial posting and payments are managed in
+
+    <span className="ml-1 cursor-pointer text-[#C11574] underline">
+      Account Payable
+    </span>
+
+  </span>
+
+</div>
+
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
   <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Frequency
+    <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[#667085]">
+      Delivery Address <span className="text-[#D92D20]">*</span>
     </label>
 
-    <input
-      value={po.frequency || ""}
-
-      readOnly
-      className=" w-full h-11 border rounded-lg px-3 bg-gray-50"/>
+    <div className="min-h-[90px] rounded-xl border border-[#EAECF0] bg-[#FCFCFD] px-4 py-4 shadow-sm">
+      <p className="text-sm leading-6 text-[#344054] whitespace-pre-wrap">
+        {po.deliveryAddress ||
+          "5,29-KS Smart Solutions Pvt Ltd,\nAnna Salai, Teynampet"}
+      </p>
+    </div>
   </div>
 
   <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Schedule On
+    <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[#667085]">
+      Billing Address <span className="text-[#D92D20]">*</span>
     </label>
 
-    <input
-      value={po.scheduleOn || ""}
-
-      readOnly
-      className="w-full h-11 border rounded-lg px-3 bg-gray-50 "/>
-  </div>
-
-  <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Date Range
-    </label>
-
-    <input
-      value={
-        po.startDate && po.endDate
-        ? `${new Date(po.startDate).toLocaleDateString()} - ${new Date(po.endDate).toLocaleDateString()}`
-        : ""
-        }
-      readOnly
-      className=" w-full h-11 border rounded-lg px-3 bg-gray-50"
-    />
+    <div className="min-h-[90px] rounded-xl border border-[#EAECF0] bg-[#FCFCFD] px-4 py-4 shadow-sm">
+      <p className="text-sm leading-6 text-[#344054] whitespace-pre-wrap">
+        {po.billingAddress ||
+          "5,29-KS Smart Solutions Pvt Ltd,\nAnna Salai, Teynampet"}
+      </p>
+    </div>
   </div>
 
 </div>
-<div className="grid grid-cols-2 gap-5 mt-6">
+<br />
 
-  <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Delivery Address
-    </label>
+<div className="rounded-xl border border-[#EAECF0] bg-white shadow-sm overflow-hidden">
+ <div className="border-b border-[#EAECF0] bg-[#FCFCFD] px-6 py-5">
 
-    <textarea
-      value={
-        po.deliveryAddress || ""
-      }
-      readOnly
-      rows={2}
-      className="w-full rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 py-3 text-[14px] text-[#344054] resize-none" />
+    <h2 className="text-[15px] font-semibold text-[#344054]">
+      Ordered Items
+    </h2>
+
+    <p className="mt-1 text-xs text-[#98A2B3]">
+      Items or service details of the Purchase Order.
+    </p>
+
   </div>
 
-  <div>
-    <label className="text-[12px] font-medium uppercase tracking-wide text-[#7C7C8A] mb-2 block">
-      Billing Address
-    </label>
+  <table className="w-full text-sm border border-[#EAECF0] border-collapse">
 
-    <textarea
-      value={
-        po.billingAddress || ""
-      }
-      readOnly
-      rows={2}
-      className="w-full rounded-xl border border-[#E8D8F5] bg-[#FAFBFC] px-4 py-3 text-[14px] text-[#344054]resize-none" />
-  </div>
+    <thead className="bg-[#F9FAFB]">
 
-</div>
-<div className="mt-10">
- <h2 className="text-[20px] font-semibold text-[#1F2937]">
-    Added Items
-  </h2>
+      <tr>
 
-  <p className="text-sm text-[#667085] mb-4">
-    Items or service details for the purchase request.
-  </p>
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          S.NO
+        </th>
 
-  <div className="overflow-hidden rounded-2xl border border-[#EEE6F7] shadow-sm bg-white">
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Items
+        </th>
 
-    <table className="w-full text-sm">
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Ordered
+        </th>
 
-      <thead className="bg-gradient-to-r from-[#7A008C] to-[#B014A6] text-white text-[#B014A6] uppercase text-[11px] tracking-wide">
-        <tr>
-          <th className="px-4 py-3 text-left">S.NO</th>
-          <th className="px-4 py-3 text-left">Items</th>
-          <th className="px-4 py-3 text-center">
-            Order Count
-          </th>
-          <th className="px-4 py-3 text-center">
-            Quantity (Per Order)
-          </th>
-          <th className="px-4 py-3 text-center">
-            Total Quantities
-          </th>
-          <th className="px-4 py-3 text-center">
-            Cost Per Unit (Rs)
-          </th>
-          <th className="px-4 py-3 text-center">
-            Units
-          </th>
-          <th className="px-4 py-3 text-right">
-            Total Cost (Rs)
-          </th>
-        </tr>
-      </thead>
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Accepted
+        </th>
 
-      <tbody>
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Rejected
+        </th>
 
-        {po.items?.map((item, index) => (
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Billed
+        </th>
+
+        <th className="px-6 py-4 text-xs font-semibold text-[#667085] text-left">
+          Balance
+        </th>
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      {po.items.map((item, index) => {
+
+        const accepted = (po.goodsReceipts || []).reduce((sum, grn) => {
+
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+
+          return sum + Number(row?.acceptedQuantity || 0);
+
+        }, 0);
+
+        const rejected = (po.goodsReceipts || []).reduce((sum, grn) => {
+
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+
+          return sum + Number(row?.rejectedQuantity || 0);
+
+        }, 0);
+
+        const billed = accepted;
+
+        const balance = item.quantity - accepted;
+
+        return (
+
           <tr
             key={item.id}
-            className="border-t border-[#F2F4F7] hover:bg-[#FAFAFC]"
+            className="border-b border-[#F2F4F7] hover:bg-[#FAFAFA] transition"
           >
-            <td className="px-5 py-4 text-sm text-[#344054]">
+
+            <td className="px-6 py-4 text-black">
               {index + 1}
             </td>
 
-            <td className="px-5 py-4 text-sm text-[#344054]">
+            <td className="px-6 py-4 text-black">
               {item.product?.productName}
             </td>
 
-            <td className="px-5 py-4 text-sm text-[#344054]">
-              {item.orderCount || 0}
-            </td>
-
-            <td className="px-5 py-4 text-sm text-[#344054]">
+            <td className="px-6 py-4  text-black">
               {item.quantity}
             </td>
 
-            <td className="px-5 py-4 text-sm text-[#344054]">
-              {(item.orderCount || 1) * item.quantity}
-            </td>
-            <td className="px-5 py-4 text-sm text-[#344054]">
-              ₹
-              {item.unitPrice?.toLocaleString()}
+            <td className="px-6 py-4  text-black">
+              {accepted}
             </td>
 
-            <td className="px-5 py-4 text-sm text-[#344054]">
-              {item.unit || "Nos"}
+            <td className="px-6 py-4  text-black">
+              {rejected}
             </td>
 
-            <td className="px-5 py-4 text-sm text-[#344054]">
-              ₹
-              {(
-                item.quantity *
-                item.unitPrice
-              ).toLocaleString()}
+            <td className="px-6 py-4  text-black">
+              {billed}
             </td>
+
+            <td className="px-6 py-4 font-medium text-black">
+              {balance}
+            </td>
+
           </tr>
-        ))}
+
+        );
+
+      })}
+
+    </tbody>
+
+    <tfoot>
+  <tr className="bg-[#FCFCFD] font-semibold border-t border-[#EAECF0]">
+    <td></td>
+
+    <td className="px-6 py-4 text-[#101828]">
+      Total
+    </td>
+
+    <td className="px-6 py-4  text-[#101828]">
+      {po.items.reduce(
+        (sum, item) => sum + Number(item.quantity || 0),
+        0
+      )}
+    </td>
+
+    <td className="px-6 py-4 text-[#101828]">
+      {po.items.reduce((sum, item) => {
+        const accepted = (po.goodsReceipts || []).reduce((total, grn) => {
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+          return total + Number(row?.acceptedQuantity || 0);
+        }, 0);
+
+        return sum + accepted;
+      }, 0)}
+    </td>
+
+    <td className="px-6 py-4 text-[#101828]">
+      {po.items.reduce((sum, item) => {
+        const rejected = (po.goodsReceipts || []).reduce((total, grn) => {
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+          return total + Number(row?.rejectedQuantity || 0);
+        }, 0);
+
+        return sum + rejected;
+      }, 0)}
+    </td>
+
+    <td className="px-6 py-4 text-[#101828]">
+      {po.items.reduce((sum, item) => {
+        const billed = (po.goodsReceipts || []).reduce((total, grn) => {
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+          return total + Number(row?.acceptedQuantity || 0);
+        }, 0);
+
+        return sum + billed;
+      }, 0)}
+    </td>
+
+    <td className="px-6 py-4 text-[#101828]">
+      {po.items.reduce((sum, item) => {
+        const accepted = (po.goodsReceipts || []).reduce((total, grn) => {
+          const row = grn.items.find(
+            (i) => i.purchaseOrderItemId === item.id
+          );
+          return total + Number(row?.acceptedQuantity || 0);
+        }, 0);
+
+        return sum + (item.quantity - accepted);
+      }, 0)}
+    </td>
+  </tr>
+</tfoot>
+
+  </table>
+
+</div>
+
+<div className="mt-8 rounded-2xl border border-[#EAECF0] bg-white shadow-sm">
+
+  <div className="flex items-center gap-2 p-4 border-b border-[#EAECF0] bg-[#FCFCFD]">
+
+    <button
+      onClick={() => setActiveTab("grn")}
+      className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+        activeTab === "grn"
+          ? "bg-[#FCE7F6] text-[#C11574] shadow-sm"
+          : "text-[#667085] hover:bg-[#F9FAFB] hover:text-[#344054]"
+      }`}
+    >
+      GRN
+    </button>
+
+    <button
+      onClick={() => setActiveTab("invoice")}
+      className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+        activeTab === "invoice"
+          ? "bg-[#FCE7F6] text-[#C11574] shadow-sm"
+          : "text-[#667085] hover:bg-[#F9FAFB] hover:text-[#344054]"
+      }`}
+    >
+      Invoices
+    </button>
+
+  </div>
 
 
-          <tr className="border-t border-[#EAD7F7] bg-gradient-to-r from-[#FFF7FD] to-[#F7EAFF]font-bold">
-          <td
-            colSpan={7}
-            className="px-4 py-4 text-right font-semibold">
-            Total Amount
-          </td>
+</div>
 
-         <td className="px-4 py-4 text-right font-bold text-[#B014A6]">
-            ₹{" "}
-            {(po.items || [])
-              .reduce(
-                (sum, item) => sum + item.quantity * item.unitPrice,
-                0
-              )
-              .toLocaleString()}
-          </td>
-                  </tr>
-
-                </tbody>
-
-              </table>
-
-            </div>
-          </div>
-          <br />
- 
-<div className="bg-white rounded-3xl border border-[#E5E7EB] p-8 mt-8">
-
-  <h2 className="text-[20px] font-semibold text-[#111827] mb-2">
-    Payment Info
+{activeTab === "grn" && (
+  <div className="mt-6">
+    <div className="flex items-center justify-between mb-5">
+      <div>
+  <h2 className="text-lg font-semibold text-[#101828]">
+    Goods Received
   </h2>
 
-  <p className="text-sm text-[#667085] mb-6">
-    Items or service details for the purchase request.
+  <p className="text-sm text-[#667085] mt-1">
+    Items received against this Purchase Order.
   </p>
-
-  <div className="bg-[#F8FAFC] border border-[#EAECF0] rounded-xl p-4 mb-6">
-    <p className="text-sm font-medium text-[#344054]">
-      Payments start only after the contract is activated.
-    </p>
-
-    <p className="text-xs text-[#667085] mt-1">
-      The contract becomes active once the Purchase Order is approved by the
-      vendor and finance team, and payments follow the terms set in the Purchase Order.
-    </p>
-  </div>
-
-  <div className="grid grid-cols-2 gap-4 mb-8">
-
-    <div
-      className={`
-      border rounded-2xl p-5
-      ${
-        selectedPaymentMethod === "invoice"
-          ? "border-[#D946EF] bg-[#FDF4FF]"
-          : "border-[#E4E7EC] bg-white"
-      }
-      `}
-    >
-      <div className="flex gap-3">
-
-        <div
-          onClick={() => setSelectedPaymentMethod("invoice")}
-
-          className={`
-          w-5 h-5 rounded-full border-2 mt-1
-          flex items-center justify-center
-          ${
-            selectedPaymentMethod === "invoice"
-              ? "border-[#B014A6]"
-              : "border-[#D0D5DD]"
-          }
-          `}
-        >
-          {selectedPaymentMethod === "invoice" && (
-            <div className="w-2 h-2 rounded-full bg-[#B014A6]" />
-          )}
-        </div>
-
-        <div>
-          <h3
-            className={`font-semibold ${
-                selectedPaymentMethod === "invoice"
-
-                ? "text-[#B014A6]"
-                : "text-[#344054]"
-            }`}
-          >
-            Invoice-Driven Payment
-          </h3>
-
-          <p className="text-sm text-[#667085]">
-            Pay only after vendor invoice is approved.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div
-      className={`
-      border rounded-2xl p-5
-      ${
-        selectedPaymentMethod === "schedule"
-          ? "border-[#D946EF] bg-[#FDF4FF]"
-          : "border-[#E4E7EC] bg-white"
-      }
-      `}
-    >
-      <div className="flex gap-3">
-
-        <div
-        onClick={() => setSelectedPaymentMethod("schedule")}
-          className={`
-          w-5 h-5 rounded-full border-2 mt-1
-          flex items-center justify-center
-          ${
-            selectedPaymentMethod === "schedule"
-              ? "border-[#B014A6]"
-              : "border-[#D0D5DD]"
-          }
-          `}
-        >
-          {selectedPaymentMethod === "schedule" && (
-            <div className="w-2 h-2 rounded-full bg-[#B014A6]" />
-          )}
-        </div>
-
-        <div>
-          <h3
-          onClick={() => setSelectedPaymentMethod("schedule")}
-            className={`font-semibold ${
-              selectedPaymentMethod === "schedule"
-                ? "text-[#B014A6]"
-                : "text-[#344054]"
-            }`}
-          >
-            Schedule-Driven Payment
-          </h3>
-
-          <p className="text-sm text-[#667085]">
-            Pay as per contract activation.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
- 
-
-  {selectedPaymentMethod === "invoice" && (
-  <>
-    <div className="grid grid-cols-2 gap-5 mb-6">
-
-      <div>
-        <label className="text-[12px] text-[#667085] mb-2 block">
-          Payment Terms
-        </label>
-
-        <input
-          value={po.paymentTerms || ""}
-          readOnly
-          className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-[#F9FAFB]"
-        />
-      </div>
-
-      <div>
-        <label className="text-[12px] text-[#667085] mb-2 block">
-          Mode of Payment
-        </label>
-
-        <input
-          value={po.modeOfPayment || ""}
-          readOnly
-          className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-[#F9FAFB]"
-        />
-      </div>
-
-    </div>
-
-    <h3 className="text-sm font-semibold mb-4">
-      Preview of Payment Terms
-    </h3>
-
-      <table className="w-full border border-[#EAECF0] rounded-xl overflow-hidden">
-
-        <thead className="bg-[#F9FAFB]">
-          <tr>
-            <th className="p-3 text-left">
-              Invoice Date
-            </th>
-
-            <th className="p-3 text-left">
-              Due Date
-            </th>
-
-            <th className="p-3 text-right">
-              Amount to be Paid (Rs)
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr className="border-t">
-
-            <td className="p-3">
-              {po.invoiceDate
-                ? new Date(po.invoiceDate).toLocaleDateString()
-                : "-"}
-            </td>
-
-            <td className="p-3">
-              {po.dueDate
-                ? new Date(po.dueDate).toLocaleDateString()
-                : "-"}
-            </td>
-
-            <td className="p-3 text-right">
-              ₹ {(po.items || [])
-  .reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
-  )
-  .toLocaleString()}
-            </td>
-
-          </tr>
-        </tbody>
-
-      </table>
-    </>
-  )}
-
-  
-
-  {selectedPaymentMethod === "schedule" && (
-    <>
-      <h3 className="text-[14px] font-semibold text-[#344054] mb-4">
-        Payment Breakdown
-      </h3>
-
-      <div className="grid grid-cols-3 gap-5 mb-6">
-
-       <div>
-  <label className="text-[12px] text-[#667085] mb-2 block">
-    Advance %
-  </label>
-
-  <select
-  value={advancePercent}
-  onChange={(e) =>
-    setAdvancePercent(
-      Number(e.target.value)
-    )
-  }
-className="
-w-full
-h-12
-rounded-xl
-border
-border-[#E4E7EC]
-bg-gradient-to-b
-from-white
-to-[#FAFAFB]
-px-4
-text-gray-800
-font-medium
-shadow-sm
-focus:ring-2
-focus:ring-[#D946EF]
-focus:border-[#D946EF]
-transition-all
-"
->
-  <option value={0}>0%</option>
-  <option value={10}>10%</option>
-  <option value={20}>20%</option>
-  <option value={25}>25%</option>
-  <option value={30}>30%</option>
-  <option value={40}>40%</option>
-  <option value={50}>50%</option>
-</select>
 </div>
-
-        <div>
-          <label className="text-[12px] text-[#667085] mb-2 block">
-            Installment % (Auto Calculated)
-          </label>
-
-          <input
-            value={installmentPercent}
-            readOnly
-            className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-[#F9FAFB]"/>
-        </div>
-
-        <div>
-  <label className="text-[12px] text-[#667085] mb-2 block">
-    Mode of Payment
-  </label>
-
-  <select
-    value={modeOfPayment}
-    onChange={(e) =>
-      setModeOfPayment(e.target.value)
-    }
-    className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-white ">
-    <option value="Online Transfer ">
-      Online Transfer
-    </option>
-
-    <option value="NEFT">
-      NEFT
-    </option>
-
-    <option value="RTGS">
-      RTGS
-    </option>
-
-    <option value="IMPS">
-      IMPS
-    </option>
-
-    <option value="Cheque">
-      Cheque
-    </option>
-
-    <option value="UPI">
-      UPI
-    </option>
-
-    <option value="Cash">
-      Cash
-    </option>
-  </select>
-</div>
-
-        <div>
-          <label className="text-[12px] text-[#667085] mb-2 block">
-            No. of Installments
-          </label>
-
-          <input
-            value={installments}
-            readOnly
-            className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-[#F9FAFB]"/>
-        </div>
-
-        <div>
-          <label className="text-[12px] text-[#667085] mb-2 block">
-            Frequency
-          </label>
-
-          <input
-            value={frequency}
-            readOnly
-            className="w-full h-[44px] border border-[#E4E7EC] rounded-lg px-4 bg-[#F9FAFB]"/>         
-        </div>
-      </div>
-                                                     
-      <h3 className="text-sm font-semibold mb-4 text-gray-700">
-        Preview of Payment Terms
-      </h3>
-
-      <table className="w-full border border-[#EAECF0] rounded-xl overflow-hidden">
-
-        <thead className="bg-[#F9FAFB] text-gray-600">
-
-          <tr>
-            <th className="p-3 text-left">S.NO</th>
-            <th className="p-3 text-left">Payments</th>
-            <th className="p-3 text-left">Due Date</th>
-            <th className="p-3 text-right">Amount (Rs)</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {po.paymentSchedules?.map((payment, index) => (
-            <tr key={payment.id} className="border-t">
-
-              <td className="p-3">
-                {index + 1}
-              </td>
-
-              <td className="p-3">
-                {payment.paymentName}
-              </td>
-
-              <td className="p-3">
-                {new Date(
-                  payment.dueDate
-                ).toLocaleDateString()}
-              </td>
-
-              <td className="p-3 text-right">
-                ₹ {payment.amount.toLocaleString()}
-              </td>
-
-            </tr>
-          ))}
-
-          <tr className="
-border-t
-border-[#EAECF0]
-bg-[#FCFAFF]
-">
-
-            <td
-              colSpan={3}
-             className="
-px-5
-py-4
-text-right
-font-semibold
-text-[#7A008C]
-"
-            >
-              Total Amount
-            </td>
-
-            <td className="p-3 text-right font-bold text-[#B014A6]">
-             ₹ {(po.paymentSchedules || [])
-              .reduce(
-                (sum, item) => sum + Number(item.amount || 0),
-                0
-              )
-              .toLocaleString()}
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-    </>
-  )}
-
-</div>
-{currentStage === "Receive Goods" && (
-  <div className="mt-8 bg-white rounded-2xl border border-[#E5E7EB]">
-    <div className="flex border-b px-6">
-      <button
-        onClick={() => setActiveTab("grn")}
-        className={`py-4 px-2 mr-8 text-sm font-medium border-b-2 ${
-          activeTab === "grn"
-            ? "border-[#B014A6] text-[#B014A6]"
-            : "border-transparent text-gray-500"
-        }`}
-      >
-        GRN
-      </button>
 
       <button
-        onClick={() => setActiveTab("invoice")}
-        className={`py-4 px-2 text-sm font-medium border-b-2 ${
-          activeTab === "invoice"
-            ? "border-[#B014A6] text-[#B014A6]"
-            : "border-transparent text-gray-500"
-        }`}
+        onClick={generateGRN}
+        className="h-10 px-5 rounded-lg border border-[#C11574] text-[#C11574] text-sm font-medium hover:bg-[#FFF4FA]"
       >
-        Invoices
+        Generate New GRN
       </button>
     </div>
 
-    {activeTab === "grn" && (
-      <div className="bg-white rounded-3xl border border-[#ECECEC] p-8">
 
-    <div className="flex justify-between items-center mb-8">
-
-    <div>
-        <div className="flex items-center gap-3">
-
-            <h2 className="text-[22px] font-semibold text-[#111827]">
-                Goods Receipt Notes
-            </h2>
-
-            <span className="px-3 py-1 rounded-full bg-[#F3E8FF] text-[#7A008C] text-xs font-medium">
-                  {po.goodsReceipts?.length || 0} GRNs
-
-            </span>
-
-        </div>
-
-        <p className="text-[#667085] mt-2">
-            Manage all Goods Receipt Notes generated for this Purchase Order.
-        </p>
-
-    </div>
-
-<button
-  onClick={generateGRN}
-  className="h-11 px-5 rounded-xl bg-[#7A008C] hover:bg-[#650073] text-white font-medium flex items-center gap-2"
->
-  +
-  Generate GRN
-</button>
-
-</div>
-        <table className="w-full">
-
-        <thead className="bg-gradient-to-r from-[#7A008C] to-[#B014A6] text-white uppercase text-[11px] tracking-wide">
-
-        <tr>
-
-        <th className="px-5 py-4 text-left">GRN No</th>
-
-        <th className="px-5 py-4 text-left">Receipt Date</th>
-
-        <th className="px-5 py-4 text-center">Items</th>
-
-        <th className="px-5 py-4 text-center">Accepted Qty</th>
-
-        <th className="px-5 py-4 text-center">Status</th>
-
-        <th className="px-5 py-4 text-right">Action</th>
-
-        </tr>
-
-    </thead>
-    <tbody>
-
-{po.goodsReceipts?.map(grn => (
-
-<tr
-key={grn.id}
-className="border-t hover:bg-[#FCFCFD]"
+    {po.goodsReceipts?.length > 0 ? (
+      po.goodsReceipts.map((grn) => (
+        <div
+  key={grn.id}
+  className="mb-8 overflow-hidden rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] shadow-sm"
 >
 
-<td>{grn.grnNumber}</td>
+          <div className="flex items-start justify-between px-6 pt-6 pb-4">
 
-<td>
-{new Date(grn.receivedDate).toLocaleDateString()}
-</td>
+            <div>
 
-<td>{grn.items.length}</td>
+              <h3 className="text-lg font-semibold text-[#101828]">
+  {grn.grnNumber}
+</h3>
 
-<td>
-
-{
-grn.items.reduce(
-(sum,i)=>sum+i.acceptedQuantity,
-0
-)
-
-}
-
-</td>
-
-<td>
-
-<span className="
-inline-flex
-items-center
-px-3
-py-1
-rounded-full
-bg-[#ECFDF3]
-text-[#027A48]
-text-xs
-font-semibold
-">
-Completed
-</span>
-
-</td>
-
-<td>
-
-<button
-  onClick={() => setSelectedGRN(grn)}
-  className="text-[#7A008C] hover:underline"
->
-  View Details
-</button>
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
-
-      </div>
-    )}
-    
-
-    {activeTab === "invoice" && (
-      <div className="p-6">
-
-        <div className="flex justify-between items-center mb-5">
-
-          <div>
-            <p className="text-sm text-gray-500">
-              Track invoice status and payments.
-            </p><br />
-            <div className="mb-5 rounded-lg border border-[#EAECF0] bg-[#F9FAFB] p-4">
-
-<p className="text-sm text-[#475467]">
-
-<b>Note:</b> Track all invoices linked to this Purchase Order here.
-Financial Posting and payments are managed in
-
-<span className="text-[#7A008C] font-medium">
-{" "}Account Payable.
-</span>
-
+             <p className="text-sm text-[#667085] mt-1">
+  Received on {new Date(grn.receivedDate).toLocaleDateString()}
 </p>
 
-</div>
-            <h3 className="text-lg font-semibold text-gray-700">
-              Invoice Summary
-            </h3>
+            </div>
 
-
+            <button
+              onClick={() =>
+                router.push(
+                  `/dashboard/procurement/purchase-orders/${id}/invoice`
+                )
+              }
+              className="h-10 px-4 rounded-lg border border-[#C11574] text-sm font-medium text-[#C11574] hover:bg-[#FFF4FA]"
+            >
+              Request for Invoice
+            </button>
 
           </div>
 
-          <div className="flex justify-end mb-5">
+          <table className="w-full text-sm">
 
-<button
-onClick={() => router.push(`/dashboard/procurement/purchase-orders/${po.id}/invoice`)}
-className="
-h-10
-px-5
-rounded-lg
-border
-border-[#B014A6]
-text-[#B014A6]
-hover:bg-[#FCF4FF]
-"
->
-Import Invoice
-</button>
+           <thead className="bg-[#F9FAFB]">
 
+              <tr>
+
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#667085] border-b border-[#EAECF0]">
+                  S.NO
+                </th>
+
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#667085] border-b border-[#EAECF0]">
+                  Items
+                </th>
+
+                <th className="border-b border-[#EAECF0] px-4 py-3 text-center text-xs font-semibold text-[#667085]">
+                  Received
+                </th>
+
+                <th className="border-b border-[#EAECF0] px-4 py-3 text-center text-xs font-semibold text-[#667085]">
+                  Accepted
+                </th>
+
+                <th className="border-b border-[#EAECF0] px-4 py-3 text-center text-xs font-semibold text-[#667085]">
+                  Rejected
+                </th>
+
+                <th className="border-b border-[#EAECF0] px-4 py-3 text-center text-xs font-semibold text-[#667085]">
+                  Invoice Eligible
+                </th>
+
+                <th className="border-b border-[#EAECF0] px-4 py-3 text-right text-xs font-semibold text-[#667085]">
+                  Billing Amount
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {grn.items.map((item, index) => {
+
+                const poItem = po.items.find(
+                  (x) => x.id === item.purchaseOrderItemId
+                );
+
+                const amount =
+                  Number(poItem?.quantity || 0) *
+                  Number(poItem?.unitPrice || 0);
+
+                return (
+
+                  <tr
+                    key={item.id}
+                    className="border-b border-[#F2F4F7] hover:bg-[#FCFCFD]"
+                  >
+
+                   <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                      {index + 1}
+                    </td>
+
+                   <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                      {poItem?.product?.productName}
+                    </td>
+
+                    <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                      {item.receivedQuantity}
+                    </td>
+
+                   <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+  <span className="inline-flex items-center rounded-full bg-[#ECFDF3] px-3 py-1 text-xs font-medium text-[#027A48]">
+    {item.acceptedQuantity}
+  </span>
+</td>
+                    <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                      {item.rejectedQuantity}
+                    </td>
+
+                    <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                      {item.acceptedQuantity}
+                    </td>
+
+                    <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                     ₹{amount.toLocaleString("en-IN")}
+                    </td>
+
+                  </tr>
+
+                );
+              })}
+
+            </tbody>
+
+            <tfoot>
+
+              <tr className="bg-[#FCFCFD] font-semibold">
+
+                <td></td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                  Total
+                </td>
+
+               <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+
+                  {grn.items.reduce(
+                    (t, i) => t + i.receivedQuantity,
+                    0
+                  )}
+
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+
+                  {grn.items.reduce(
+                    (t, i) => t + i.acceptedQuantity,
+                    0
+                  )}
+
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+
+                  {grn.items.reduce(
+                    (t, i) => t + i.rejectedQuantity,
+                    0
+                  )}
+
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+
+                  {grn.items.reduce(
+                    (t, i) => t + i.acceptedQuantity,
+                    0
+                  )}
+
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+
+                  ₹{" "}
+                  {grn.items
+                    .reduce((sum, item) => {
+                      const poItem = po.items.find(
+                        (x) =>
+                          x.id === item.purchaseOrderItemId
+                      );
+
+                      return (
+                        sum +
+                        Number(item.acceptedQuantity) *
+                          Number(poItem?.unitPrice || 0)
+                      );
+                    }, 0)
+                    .toLocaleString()}
+
+                </td>
+
+              </tr>
+
+            </tfoot>
+
+          </table>
+
+         <div className="border-t border-[#EAECF0] p-6">
+  <label className="block text-sm font-medium text-[#344054] mb-2">
+    Remarks
+  </label>
+
+  <textarea
+    rows={4}
+    value={remarks[grn.id] || ""}
+    onChange={(e) =>
+      setRemarks((prev) => ({
+        ...prev,
+        [grn.id]: e.target.value,
+      }))
+    }
+    placeholder="Enter your remarks here for this GRN..."
+    className="w-full rounded-lg border border-[#D0D5DD] bg-white px-4 py-3 text-sm text-[#101828] placeholder:text-[#98A2B3] focus:border-[#C11574] focus:ring-2 focus:ring-[#FCE7F6] outline-none resize-none"
+  />
 </div>
-
 
         </div>
+      ))
+    ) : (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#D0D5DD] bg-[#FCFCFD] py-20">
 
-        <div className="rounded-xl border border-[#EAECF0] overflow-hidden">
+  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F4F4F5]">
+    📦
+  </div>
 
-<table className="w-full text-sm">
+  <h3 className="text-lg font-semibold text-[#101828]">
+    No Goods Receipt Notes
+  </h3>
 
-<thead className="bg-[#F9FAFB] text-[#475467]">
+  <p className="mt-2 text-sm text-[#667085] text-center max-w-md">
+    No GRN has been generated for this Purchase Order yet.
+    Generate a GRN once the vendor delivers the goods.
+  </p>
 
-<tr>
-
-<th className="w-12 px-4 py-3">S.NO</th>
-
-<th className="px-4 py-3 text-left">
-GRN No
-</th>
-
-<th className="px-4 py-3 text-left">
-Type
-</th>
-
-<th className="px-4 py-3 text-center">
-Quantity
-</th>
-
-<th className="px-4 py-3 text-right">
-Amount (Rs)
-</th>
-
-<th className="px-4 py-3 text-center">
-Invoice Status
-</th>
-
-<th className="px-4 py-3 text-center">
-3-Way Matching
-</th>
-
-<th className="px-4 py-3 text-center">
-Invoice Number
-</th>
-
-<th className="px-4 py-3 text-center">
-Actions
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{po.invoices?.map((invoice,index)=>(
-
-<tr
-key={invoice.id}
-className="border-t hover:bg-[#FCFCFD]"
->
-
-<td className="px-4 py-4">
-{index+1}
-</td>
-
-<td className="px-4 py-4">
-{invoice.goodsReceipt?.grnNumber}
-</td>
-
-<td className="px-4 py-4">
-{invoice.invoiceType}
-</td>
-
-<td className="px-4 py-4 text-center">
-{invoice.quantity}
-</td>
-
-<td className="px-4 py-4 text-right">
-
-₹ {invoice.amount.toLocaleString()}
-
-</td>
-
-<td className="px-4 py-4 text-center">
-
-<span
-className={`px-3 py-1 rounded-full text-xs font-medium
-${
-invoice.invoiceStatus==="Received"
-?"bg-green-100 text-green-700"
-:"bg-yellow-100 text-yellow-700"
-}
-`}
->
-
-{invoice.invoiceStatus}
-
-</span>
-
-</td>
-
-<td className="px-4 py-4 text-center">
-
-<span
-className={`px-3 py-1 rounded-full text-xs font-medium
-${
-invoice.matchingStatus==="Matched"
-?"bg-green-100 text-green-700"
-:"bg-gray-100 text-gray-600"
-}
-`}
->
-
-{invoice.matchingStatus}
-
-</span>
-
-</td>
-
-<td className="px-4 py-4 text-center">
-
-{invoice.invoiceNumber}
-
-</td>
-
-<td className="px-4 py-4">
-
-<div className="flex justify-center gap-2">
-
-<button
-onClick={()=>
-router.push(`/dashboard/invoices/${invoice.id}`)
-}
-className="text-gray-500 hover:text-[#7A008C]"
->
-
-👁
-
-</button>
-
-<a
-href={invoice.invoiceFile}
-target="_blank"
-className="text-gray-500 hover:text-[#7A008C]"
->
-
-⬇
-
-</a>
+  <button
+    onClick={generateGRN}
+    className="mt-6 rounded-lg bg-[#7A008C] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#650073]"
+  >
+    Generate GRN
+  </button>
 
 </div>
-
-</td>
-
-</tr>
-
-))}
-
-{po.invoices?.length===0 &&(
-
-<tr>
-
-<td
-colSpan={9}
-className="py-10 text-center text-gray-500"
->
-
-No invoices available
-
-</td>
-
-</tr>
-
-)}
-
-</tbody>
-
-</table>
-
-</div>
-      </div>
     )}
+
+
+   </div>
+  )}
+
+
+   {activeTab === "invoice" && (
+  <div className="mt-6 rounded-xl border border-[#EAECF0] bg-white shadow-sm overflow-hidden">
+<div className="flex items-center justify-between px-6 py-6 bg-white border-b border-[#EAECF0]">    
+  <div>
+        <h2 className="text-lg font-semibold text-[#101828]">
+    Invoices
+</h2>
+
+        <p className="text-sm text-[#667085] mt-1">
+    View and manage invoices linked to this Purchase Order.
+</p>
+    </div>
+  <div>
+   
+  </div>
+  <button
+  className="h-10 px-5 rounded-lg bg-[#7A008C] text-white text-sm font-medium hover:bg-[#650073] transition"
+>
+  Import Invoice
+</button>
+</div>
+
+
+    <div className="mb-5 rounded-md border border-[#EAECF0] bg-[#FCFCFD] px-4 py-3">
+
+      <span className="text-xs text-[#667085]">
+
+        <span className="font-semibold">Note:</span>{" "}
+        Track all invoices linked to this Purchase Order here.
+        Financial Posting and payments are managed in
+        <span className="ml-1 text-[#C11574] underline cursor-pointer">
+          Account Payable
+        </span>
+
+      </span>
+
+    </div>
+
+<h3 className="text-sm font-semibold text-[#344054] mb-4">
+    Invoice Summary
+</h3>
+<div className="overflow-hidden rounded-xl border border-[#EAECF0] bg-white shadow-sm">
+  <table className="w-full">
+    <thead className="bg-[#F9FAFB]">
+      <tr>
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          S.NO
+        </th>
+
+       <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          GRN No
+        </th>
+
+       <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Type
+        </th>
+
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Quantity
+        </th>
+
+       <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Amount (₹)
+        </th>
+
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Invoice Status
+        </th>
+
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          3-Way Matching
+        </th>
+
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Invoice Number
+        </th>
+
+        <th className="px-6 py-4 text-left text-xs font-semibold text-[#667085] border border-[#EAECF0]">
+          Actions
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {(po.goodsReceipts || []).map((grn, index) => {
+        const qty = grn.items.reduce(
+          (sum, item) => sum + Number(item.acceptedQuantity || 0),
+          0
+        );
+
+        const amount = grn.items.reduce((sum, item) => {
+          const poItem = po.items.find(
+            (x) => x.id === item.purchaseOrderItemId
+          );
+
+          return (
+            sum +
+            Number(item.acceptedQuantity || 0) *
+              Number(poItem?.unitPrice || 0)
+          );
+        }, 0);
+
+        return (
+          <tr
+            key={grn.id}
+            className="border-t border-[#F2F4F7] hover:bg-[#FCFCFD]"
+          >
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">{index + 1}</td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              {grn.grnNumber}
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              Tax Invoice
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              {qty}
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              ₹{amount.toLocaleString("en-IN")}
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                Received
+              </span>
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                Matched
+              </span>
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              {`INV-${po.poNumber}`}
+            </td>
+
+            <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+              <button
+                onClick={() =>
+                  router.push(
+                    `/dashboard/procurement/purchase-orders/${id}/invoice`
+                  )
+                }
+                className="rounded-lg border border-[#D0D5DD] px-4 py-2 text-sm font-medium text-[#344054] hover:bg-[#F9FAFB]"
+              >
+                View
+              </button>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+
+    <div className="flex justify-between items-center px-6 py-4 bg-[#FCFCFD] border-t border-[#EAECF0]">
+    
+
+    <div className="border-t border-[#EAECF0] py-3 text-center">
+    <button className="text-[#C11574] text-sm font-medium">
+        + Add New
+    </button>
+</div>
+</div>
 
   </div>
 )}
+
+  
 <div className="flex justify-end gap-4 mt-10">
   <button
     onClick={() => router.back()}
-className="
-px-6
-h-11
-rounded-xl
-border
-border-[#D0D5DD]
-bg-white
-text-[#344054]
-font-medium
-hover:bg-[#F9FAFB]
-transition
-"
+className="px-6 h-11 rounded-xl border border-[#D0D5DD] bg-white text-[#344054] font-medium shadow-sm hover:bg-[#F9FAFB] hover:shadow transition"
   >
     Cancel
   </button>
@@ -1504,7 +1129,7 @@ transition
         updateStatus(workflow[currentStage].next);
       }
     }}
-    className="px-6 h-11 rounded-lg bg-[#7A008C] text-white"
+    className="px-6 h-11 rounded-xl bg-[#7A008C] text-white font-medium shadow-md hover:bg-[#650073] hover:shadow-lg transition"
   >
     {buttonText}
   </button>
@@ -1514,9 +1139,9 @@ transition
 {showClosePopup && (
   <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-    <div className="bg-white rounded-xl w-[420px] shadow-xl">
+    <div className="bg-white rounded-2xl w-[450px] shadow-2xl border border-[#EAECF0]">
 
-      <div className="p-6">
+      <div className="p-8">
 
         <h2 className="text-lg font-semibold mb-3">
           {closeType === "pending"
@@ -1576,6 +1201,78 @@ transition
 )}
         </div>
       </div>
+      {selectedGRN && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="w-[700px] rounded-xl bg-white shadow-xl border border-[#EAECF0]">
+
+      <div className="flex items-center justify-between border-b px-6 py-4">
+        <div>
+          <h2 className="text-lg font-semibold">
+            {selectedGRN.grnNumber}
+          </h2>
+          <p className="text-sm text-gray-500">
+            {new Date(selectedGRN.receivedDate).toLocaleDateString()}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setSelectedGRN(null)}
+          className="text-gray-500 text-xl"
+        >
+          ×
+        </button>
+      </div>
+
+      <table className="w-full text-sm">
+        <thead className="bg-[#F9FAFB]">
+          <tr>
+            <th className="px-6 py-3 text-left">Item</th>
+            <th className="px-6 py-3 text-center">Received</th>
+            <th className="px-6 py-3 text-center">Accepted</th>
+            <th className="px-6 py-3 text-center">Rejected</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {selectedGRN.items.map((item) => {
+            const poItem = po.items.find(
+              (x) => x.id === item.purchaseOrderItemId
+            );
+
+            return (
+              <tr key={item.id} className="border-b">
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                  {poItem?.product?.productName}
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                  {item.receivedQuantity}
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                  {item.acceptedQuantity}
+                </td>
+
+                <td className="border border-[#EAECF0] px-6 py-5 text-sm text-black">
+                  {item.rejectedQuantity}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div className="border-t p-5 flex justify-end">
+        <button
+          onClick={() => setSelectedGRN(null)}
+          className="px-5 py-2 rounded-lg bg-[#7A008C] text-white"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

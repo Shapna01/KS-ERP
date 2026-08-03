@@ -115,11 +115,11 @@ export default function PurchaseOrdersPage() {
   key={po.id}
   className="border-t border-[#EAECF0] text-[12px]"
 >
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
     <input type="checkbox" />
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
   <Link
       href={`/dashboard/procurement/purchase-orders/${po.id}`}
 
@@ -129,35 +129,35 @@ export default function PurchaseOrdersPage() {
   </Link>
 </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
     {po.project?.projectCode || po.project?.id}
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black text-black ">
     {po.rfq?.rfqNumber}
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
       {po.rfq?.purchaseRequisition?.requestorDept}
 
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 ">
     <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-[10px]">
        {po.rfq?.purchaseRequisition?.priority}
 
     </span>
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
      {po.rfq?.purchaseRequisition?.category}
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
     One-time
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 ">
   <span
     className={`px-2 py-1 rounded text-[10px] ${
       po.status === "Closed"
@@ -173,7 +173,7 @@ export default function PurchaseOrdersPage() {
   </span>
 </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black ">
     ₹
     {po.items
       ?.reduce(
@@ -184,7 +184,7 @@ export default function PurchaseOrdersPage() {
       .toLocaleString()}
   </td>
 
-  <td className="px-4 py-4">
+  <td className="px-4 py-4 text-black">
     {new Date(
       po.expectedDeliveryDate
     ).toLocaleDateString()}

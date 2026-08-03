@@ -66,7 +66,7 @@ export default function VendorPage() {
             <div className="flex justify-between items-center mb-6">
 
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-2xl font-semibold text-gray-800">
                   Vendor Details
                 </h2>
 
@@ -152,7 +152,7 @@ export default function VendorPage() {
                       </div>
                     </td>
                   <td className="p-4">
-                <div className="flex gap-3">
+                <div className="flex gap-3 text-black">
                 <Link href={`/dashboard/procurement/vendors/${vendor.id}`}>
 
                 View

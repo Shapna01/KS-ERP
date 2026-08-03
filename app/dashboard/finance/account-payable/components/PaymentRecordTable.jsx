@@ -12,27 +12,27 @@ export default function PaymentRecordTable({
 
           <tr>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               S.No
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               Payment Date
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               Amount
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               Payment Mode
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               Reference No
             </th>
 
-            <th className="px-5 py-4 text-left">
+            <th className="px-5 py-4 text-left text-gray-700">
               Remarks
             </th>
 
@@ -51,32 +51,32 @@ export default function PaymentRecordTable({
                 className="border-t hover:bg-gray-50"
               >
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-black">
                   {index + 1}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-black">
                   {new Date(
                     payment.date
                   ).toLocaleDateString("en-IN")}
                 </td>
 
-                <td className="px-5 py-4 font-medium">
+                <td className="px-5 py-4 font-medium text-black">
                   ₹
                   {Number(
                     payment.amount
                   ).toLocaleString("en-IN")}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-black">
                   {payment.mode}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-black">
                   {payment.reference}
                 </td>
 
-                <td className="px-5 py-4">
+                <td className="px-5 py-4 text-black">
                   {payment.remarks || "-"}
                 </td>
 
@@ -90,7 +90,7 @@ export default function PaymentRecordTable({
 
               <td
                 colSpan={6}
-                className="text-center py-10 text-gray-500"
+                className="text-center py-10 text-gray-500 "
               >
                 No Payment Records Found
               </td>

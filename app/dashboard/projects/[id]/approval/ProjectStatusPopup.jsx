@@ -1,14 +1,12 @@
 "use client";
 
 import { Check, X, Hourglass, X as Close } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function ProjectStatusPopup({
   open,
   status,
   onClose,
 }) {
-    const router = useRouter();
   if (!open) return null;
 
   const config = {
@@ -41,32 +39,31 @@ export default function ProjectStatusPopup({
             Project Status
           </h2>
 
-         <button
-  onClick={() => {
-    onClose();
-
-    if (status === "Approved") {
-      router.push("/projects");
-    }
-  }}
->
-  <Close size={18} />
-</button>
+         <button onClick={onClose}>
+          <Close size={18} />
+        </button>
         </div>
 
-        <div className="py-12 flex flex-col items-center">
+       <div className="py-12 flex flex-col items-center">
 
-          <div
-            className={`w-16 h-16 rounded-full flex items-center justify-center ${item.bg}`}
-          >
-            {item.icon}
-          </div>
+  <div
+    className={`w-16 h-16 rounded-full flex items-center justify-center ${item.bg}`}
+  >
+    {item.icon}
+  </div>
 
-          <p className="text-center mt-8 text-gray-700 w-64">
-            {item.text}
-          </p>
+  <p className="text-center mt-8 text-gray-700 w-64">
+    {item.text}
+  </p>
 
-        </div>
+  <button
+    onClick={onClose}
+    className="mt-8 px-8 py-2 bg-[#7A008C] text-white rounded-lg hover:bg-[#650073]"
+  >
+    OK
+  </button>
+
+</div>
 
       </div>
 

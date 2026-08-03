@@ -194,7 +194,7 @@ export default function AccountPayablePage() {
 
             <div className="flex justify-between items-center px-6 py-5 border-b">
 
-              <h2 className="font-semibold text-lg">
+              <h2 className="text-3xl font-semibold text-lg text-black">
 
                 Purchase Orders
                 ({filteredPOs.length})
@@ -206,7 +206,7 @@ export default function AccountPayablePage() {
             <div className="flex gap-8 px-6 border-b">
 
               {[
-                "All",
+                "All PO",
                 "Partially Paid",
                 "Fully Paid",
                 "Unpaid",

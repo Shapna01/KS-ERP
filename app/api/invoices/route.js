@@ -77,7 +77,9 @@ export async function POST(req) {
             Number(body.grandTotal || 0),
 
           paymentTerms:
-            body.paymentTerms || null,
+          typeof body.paymentTerms === "string"
+            ? body.paymentTerms
+            : null,
 
           paymentMethod:
             body.paymentMethod || null,

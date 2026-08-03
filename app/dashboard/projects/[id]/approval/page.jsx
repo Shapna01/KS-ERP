@@ -44,14 +44,14 @@ const project = await prisma.project.findUnique({
             </div>
 
             <h1 className="text-4xl font-bold text-[#111827]">
-  {project.projectName}
-</h1>
+              {project.projectName}
+            </h1>
 
-<p className="text-gray-500 mt-3 max-w-3xl leading-7">
-  {project.projectDescription}
-</p>
+            <p className="text-gray-500 mt-3 max-w-3xl leading-7">
+              {project.projectDescription}
+            </p>
 
-            <div className="grid grid-cols-3 max-w-3xl mb-8">
+            <div className="grid grid-cols-3 w-full max-w-[730px] mb-8">
 
               <div className="bg-[#F4D8F8] text-[#7A008C] text-center py-3 rounded-l-md font-medium text-sm border">
                 Submitted

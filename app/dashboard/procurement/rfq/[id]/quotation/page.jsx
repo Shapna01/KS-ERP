@@ -6,21 +6,13 @@ import { useRouter } from "next/navigation";
 
 export default function VendorQuotationPage() {
   const { id } = useParams();
-  const [selectedQuote, setSelectedQuote] = useState(null);
+const [selectedQuotes, setSelectedQuotes] = useState([]);
   const [groupedQuotes, setGroupedQuotes] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
 
 const [createdPOs, setCreatedPOs] = useState([]);
-  {
-  showPopup && (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40">
-      <div className="bg-white p-6 rounded-lg">
-        Purchase Order Created Successfully
-      </div>
-    </div>
-  );
-}
+  
  useEffect(() => {
   if (id) {
     fetchData();
@@ -105,41 +97,46 @@ const fetchData = async () => {
 };
 
 const createPurchaseOrder = async () => {
-  if (!selectedQuote) {
-    alert("Please choose a vendor first");
-    return;
-  }
+  if (selectedQuotes.length === 0) {
+  alert("Please choose at least one vendor.");
+  return;
+}
 
+ const created = [];
+
+for (const quote of selectedQuotes) {
   const res = await fetch("/api/purchase-orders", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-  rfqId: Number(id),
-  vendorId: selectedQuote.vendor.id,
-  projectId: selectedQuote.projectId,
-  orderDate: new Date(),
-  expectedDeliveryDate: selectedQuote.expectedDeliveryDate,
-
-  items: [
-  {
-    productId: selectedQuote.product.id,
-    quantity: Number(selectedQuote.quantity),
-    unitPrice: Number(selectedQuote.costPerUnit),
-  },
-],
-})
+      rfqId: Number(id),
+      vendorId: quote.vendor.id,
+      projectId: quote.projectId,
+      orderDate: new Date(),
+      expectedDeliveryDate: quote.expectedDeliveryDate,
+      items: [
+        {
+          productId: quote.product.id,
+          quantity: Number(quote.quantity),
+          unitPrice: Number(quote.costPerUnit),
+        },
+      ],
+    }),
   });
 
   const data = await res.json();
 
-if (res.ok) {
-  setCreatedPOs([data]);
-  setShowPopup(true);
-} else {
-  alert(data.error);
+  if (res.ok) {
+    created.push(data);
+  } else {
+    alert(data.error);
+  }
 }
+
+setCreatedPOs(created);
+setShowPopup(true);
 };
   return (
   <div className="min-h-screen bg-[#F7F7FA] p-8">
@@ -282,12 +279,22 @@ if (res.ok) {
           <td className="px-3 py-3 border border-gray-200">
             <div className="flex justify-center gap-2">
               <button
-                onClick={() => setSelectedQuote(quote)}
+                onClick={() => {
+  setSelectedQuotes((prev) => {
+    const exists = prev.find((q) => q.id === quote.id);
+
+    if (exists) {
+   return prev.filter((q) => q.id !== quote.id);
+    }
+
+    return [...prev, quote];
+  });
+}}
                 className={`px-4 py-1 rounded-md text-sm ${
-                  selectedQuote?.id === quote.id
-                    ? "bg-[#A000B4] text-white"
-                    : "bg-[#F4DDF5] text-[#A000B4]"
-                }`}
+  selectedQuotes.some((q) => q.id === quote.id)
+    ? "bg-[#A000B4] text-white"
+    : "bg-[#F4DDF5] text-[#A000B4]"
+}`}
               >
                 Choose
               </button>

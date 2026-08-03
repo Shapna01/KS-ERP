@@ -14,7 +14,8 @@ export default function CreateRFQPage() {
   const router = useRouter();
   const [pr, setPr] = useState(null);
   const [selectedVendor, setSelectedVendor] = useState("");
-  
+  const [projectList, setProjectList] = useState([]);
+const [selectedProject, setSelectedProject] = useState("");
   const [addedVendors, setAddedVendors] = useState([]);  
   const [selectedItems, setSelectedItems] = useState([]);
   const [deliveryCharge, setDeliveryCharge] = useState("");
@@ -43,10 +44,6 @@ const fetchProducts = async () => {
 
   setProducts(data);
 };
-useEffect(() => {
-  fetchVendors();
-  fetchProducts();
-}, []);
 
 useEffect(() => {
   localStorage.setItem(
@@ -83,7 +80,24 @@ useEffect(() => {
 
     fetchPR();
   }, [id]);
-  
+  const fetchProjects = async () => {
+  const res = await fetch("/api/projects");
+  const data = await res.json();
+  setProjectList(data);
+};
+
+useEffect(() => {
+  fetchVendors();
+  fetchProducts();
+  fetchProjects();
+}, []);
+
+useEffect(() => {
+  if (pr?.projectId) {
+    setSelectedProject(pr.projectId);
+  }
+}, [pr]);
+
     if (!pr) {
     return <div className="p-10">Loading...</div>;
     }
@@ -246,6 +260,32 @@ const handleSendMail = async () => {
     `/dashboard/procurement/rfq/${rfqId}/quotation`
   );
 };
+
+
+const increaseQuantity = (id) => {
+  setAddedProducts((prev) =>
+    prev.map((item) =>
+      item.id === id
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    )
+  );
+};
+
+const decreaseQuantity = (id) => {
+  setAddedProducts((prev) =>
+    prev.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            quantity: item.quantity > 1 ? item.quantity - 1 : 1,
+          }
+        : item
+    )
+  );
+};
+
+
   return (
    <div className="flex min-h-screen bg-[#FCFAFE]">
       <Sidebar />
@@ -363,28 +403,21 @@ transition
 
               <div>
                 <label className="text-xs font-medium uppercase tracking-wide text-[#7C7C8A]">
-                  Project Number
+                  Project Name
                 </label>
-                <input
-                  className="
-mt-2
-h-11
-w-full
-rounded-xl
-border
-border-gray-300
-bg-white
-px-4
-text-sm
-focus:border-purple-600
-focus:ring-2
-focus:ring-purple-100
-outline-none
-transition
-"
-                  value={pr.project?.projectCode || ""}
-                  readOnly
-                />
+                <select
+  value={selectedProject}
+  onChange={(e) => setSelectedProject(e.target.value)}
+  className="mt-2 h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-black"
+>
+  <option value="">Select Project</option>
+
+  {projectList.map((project) => (
+    <option key={project.id} value={project.id}>
+  {project.projectName}
+</option>
+  ))}
+</select>
               </div>
 
               <div>
@@ -642,12 +675,12 @@ transition-colors
                   </tr>
 
                 ))}
-                                </tbody>
-                              </table>
+                </tbody>
+                </table>
 
-                              {!isReadOnly && (
-<div className="p-3 border-t">
-                               <div className="flex gap-3 items-center">
+             {!isReadOnly && (
+            <div className="p-3 border-t">
+            <div className="flex gap-3 items-center">
   <select
     value={selectedVendor}
     disabled={isReadOnly}
@@ -663,7 +696,7 @@ transition-colors
       h-11 w-[320px]
       rounded-xl
       border border-gray-300
-
+      text-black
       bg-white
       px-4
       text-sm
@@ -772,9 +805,29 @@ transition-colors
         {item.productCode}
       </td>
 
-      <td className="px-5 py-4 text-sm text-gray-600">
-        {item.quantity}
-      </td>
+     <td className="px-5 py-4">
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={() => decreaseQuantity(item.id)}
+          className="w-8 h-8 border rounded-md hover:bg-gray-100 text-[#8A2BE2] "
+          disabled={isReadOnly}
+        >
+          -
+        </button>
+
+        <span className="w-10 text-center font-medium text-[#8A2BE2]">
+          {String(item.quantity).padStart(2, "0")}
+        </span>
+
+        <button
+          onClick={() => increaseQuantity(item.id)}
+          className="w-8 h-8 border rounded-md hover:bg-gray-100 text-[#8A2BE2]"
+          disabled={isReadOnly}
+        >
+          +
+        </button>
+      </div>
+    </td>
 
       <td className="px-5 py-4 text-sm text-gray-600">
         ₹ {item.estimatedRate}
@@ -816,55 +869,57 @@ transition
               </table>
 
               <div className="flex gap-3 p-3 border-t">
-  <select
-    value={selectedProduct}
-    onChange={(e) =>
-      setSelectedProduct(e.target.value)
-    }
-   className="
-h-11
-rounded-xl
-border
-border-gray-300 
-bg-white
-px-4
-focus:border-[#8A2BE2]
-focus:ring-2
-focus:ring-[#EFE3FB]
-outline-none
-"
+              <select
+                value={selectedProduct}
+                onChange={(e) =>
+                  setSelectedProduct(e.target.value)
+                }
+              className="
+                h-11
+                text-black
+                rounded-xl
+                border
+                border-gray-300 
+                bg-white
+                px-4
+                focus:border-[#8A2BE2]
+                focus:ring-2
+                focus:ring-[#EFE3FB]
+                outline-none
+                "
 
-  >
-    <option value="">
-      Select Product
-    </option>
+                  >
+                <option value="" className="text-gray-500">
+                  Select Product
+                </option>
 
-    {products.map((product) => (
-      <option
-        key={product.id}
-        value={product.id}
-      >
-        {product.productName}
-      </option>
-    ))}
+                {products.map((product) => (
+                  <option
+                    key={product.id}
+                    value={product.id}
+                    className="text-black"
+                  >
+                    {product.productName}
+                  </option>
+                ))}
 
-    <option value="add-item">
-      + Add Item
-    </option>
-  </select>
+                <option value="add-item">
+                  + Add Item
+                </option>
+              </select>
 
-  <button
-    onClick={handleAddProduct}
-    className="
-      bg-[#8A2BE2]
-      text-white
-      px-5
-      rounded-xl
-    "
-  >
-    Add
-  </button>
-</div>
+              <button
+                onClick={handleAddProduct}
+                className="
+                  bg-[#8A2BE2]
+                  text-white
+                  px-5
+                  rounded-xl
+                "
+              >
+                Add
+              </button>
+            </div>
             </div>
 
              <h2 className="mb-4 text-lg font-semibold text-gray-500 border-b border-gray-300 pb-2">
@@ -882,9 +937,9 @@ outline-none
       value={deliveryCharge}
       onChange={(e) => setDeliveryCharge(e.target.value)}
        disabled={isReadOnly}
-      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white"
+      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white text-black "
     >
-      <option value="">Select</option>
+      <option value="" >Select</option>
       <option value="yes">Yes</option>
       <option value="no">No</option>
     </select>
@@ -898,7 +953,7 @@ outline-none
     <select
       value={deliveryType}
       onChange={(e) => setDeliveryType(e.target.value)}
-      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white"
+      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white text-black"
     >
       <option value="">Select</option>
       <option value="Door Delivery">Partial Delivery Allowed</option>
@@ -916,7 +971,7 @@ outline-none
       onChange={(e) =>
         setReturnResponsibility(e.target.value)
       }
-      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white"
+      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white text-black"
     >
       <option value="">Select</option>
       <option value="yes">Yes</option>
@@ -934,7 +989,7 @@ outline-none
       onChange={(e) =>
         setReplacementResponsibility(e.target.value)
       }
-      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white"
+      className="mt-2 h-12 w-full rounded-xl border border-gray-300 px-4 bg-white text-black"
     >
       <option value="">Select</option>
       <option value="yes">Yes</option>

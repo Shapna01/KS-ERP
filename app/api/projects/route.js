@@ -24,17 +24,45 @@ export async function POST(request) {
   try {
     const formData = await request.formData();
 
-    const projectName = formData.get("projectName");
-    const projectCode = formData.get("projectCode");
+    const projectName = formData.get("projectName")?.toString().trim();
+    const projectCode = formData.get("projectCode")?.toString().trim();
     const projectDescription = formData.get("projectDescription");
     const estimatedBudget = formData.get("estimatedBudget");
     const projectManager = formData.get("projectManager");
     const startDate = formData.get("startDate");
     const endDate = formData.get("endDate");
 
-    const files = formData.getAll("files");
+    const existingProject = await prisma.project.findFirst({
+      where: {
+        OR: [
+          {
+            projectName: {
+              equals: projectName,
+              mode: "insensitive", 
+            },
+          },
+          {
+            projectCode: {
+              equals: projectCode,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+    });
 
-    console.log("Uploaded Files:", files);
+    if (existingProject) {
+      return NextResponse.json(
+        {
+          error:
+            existingProject.projectName.toLowerCase() ===
+            projectName.toLowerCase()
+              ? "Project name already exists."
+              : "Project code already exists.",
+        },
+        { status: 409 }
+      );
+    }
 
     const project = await prisma.project.create({
       data: {
@@ -51,7 +79,7 @@ export async function POST(request) {
 
     return NextResponse.json(project);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return NextResponse.json(
       { error: "Failed to create project" },

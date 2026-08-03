@@ -183,23 +183,23 @@ export default function RegisterPaymentPage() {
                 />
 
               </div>
-<div>
-  <label className="block text-xs font-medium text-gray-600 mb-1">
-    Payment Date <span className="text-red-500">*</span>
-  </label>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Payment Date <span className="text-red-500">*</span>
+                </label>
 
-  <input
-    type="date"
-    value={form.paymentDate}
-    onChange={(e) =>
-      setForm({
-        ...form,
-        paymentDate: e.target.value,
-      })
-    }
-    className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 focus:border-[#7A008C] focus:ring-2 focus:ring-[#7A008C]/20 outline-none"
-  />
-</div>
+                <input
+                  type="date"
+                  value={form.paymentDate}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      paymentDate: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 focus:border-[#7A008C] focus:ring-2 focus:ring-[#7A008C]/20 outline-none"
+                />
+              </div>
               <div>
 
                 <label className="block text-sm text-gray-500 mb-2">
@@ -230,7 +230,7 @@ export default function RegisterPaymentPage() {
 
                 <input
                   type="text"
-                  name="referenceNo"
+                  name="referenceNo" 
                   value={form.referenceNo}
                   onChange={handleChange}
                   placeholder="Enter Reference Number"

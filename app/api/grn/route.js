@@ -97,14 +97,11 @@ export async function POST(req) {
       });
 
     if (!purchaseOrder) {
-      return NextResponse.json(
-        {
-          message: "Purchase Order not found",
-        },
-        {
-          status: 404,
-        }
-      );
+     console.log("Purchase Order not found");
+return NextResponse.json(
+  { message: "Purchase Order not found" },
+  { status: 404 }
+);
     }
 
     const grnItems = [];

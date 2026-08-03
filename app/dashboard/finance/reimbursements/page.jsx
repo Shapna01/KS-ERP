@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Filter, Download, Plus } from "lucide-react";
-import FinanceSidebar from "../components/FinanceSidebar";
 import Sidebar from "../../users/components/Sidebar";
 import Topbar from "../../users/components/Topbar";
 
@@ -113,7 +112,6 @@ export default function ReimbursementsPage() {
     <div className="flex min-h-screen bg-[#F7F7FA]">
 
       <Sidebar />
-      <FinanceSidebar />
 
       <div className="flex-1 flex flex-col ml-[74px]">
 
@@ -125,7 +123,6 @@ export default function ReimbursementsPage() {
             <span className="text-[#7A008C]">
               Finance
             </span>
-
             <span className="mx-2">{">"}</span>
 
             <span>
@@ -137,7 +134,7 @@ export default function ReimbursementsPage() {
 
             <div>
 
-              <h1 className="text-3xl font-semibold text-[#7A008C]">
+              <h1 className="text-4xl font-bold text-[#7A008C]">
                 Reimbursements
               </h1>
 

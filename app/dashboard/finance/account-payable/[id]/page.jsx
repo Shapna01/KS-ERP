@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 
 import Sidebar from "@/app/dashboard/users/components/Sidebar";
 import Topbar from "@/app/dashboard/users/components/Topbar";
-import FinanceSidebar from "../components/FinanceSidebar";
 import SummaryCard from "../components/SummaryCard";
 import InvoiceTable from "../components/InvoiceTable";
 import PaymentRecordTable from "../components/PaymentRecordTable";
@@ -80,7 +79,6 @@ export default function AccountPayableDetailsPage() {
     <div className="flex min-h-screen bg-[#F7F7FA]">
 
       <Sidebar />
-      <FinanceSidebar />
 
       <div className="flex-1 flex flex-col ml-[74px]">
 
@@ -120,7 +118,7 @@ export default function AccountPayableDetailsPage() {
               <p className="text-gray-500 mt-2">
 
                 Tracks and settles vendor liabilities
-                through invoices, advances and payments.
+                through invoices, and payments.
 
               </p>
 

@@ -44,7 +44,7 @@ export default function Sidebar() {
   },
   {
     icon: <Wallet size={18} />,
-    path: "/dashboard/finance/reimbursement",
+    path: "/dashboard/finance/reimbursements",
   },
   {
     icon: <Receipt size={18} />,

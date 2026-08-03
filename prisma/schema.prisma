@@ -14,7 +14,7 @@ model designations {
   team_associated String
   department      String
   department_head String
-  users           users[] 
+  users           users[]
 }
 
 model users {
@@ -96,8 +96,8 @@ model ApprovalLevel {
 model Project {
   id Int @id @default(autoincrement())
 
-  projectName        String
-  projectCode        String
+  projectName String @unique
+  projectCode String @unique
   projectDescription String
 
   estimatedBudget Float
@@ -449,7 +449,7 @@ model Invoice {
 
   grandTotal Float @default(0)
 
-  paymentTerms  String?
+  paymentTerms  Json?
   paymentMethod String?
 
   invoiceFile String?
@@ -492,20 +492,20 @@ model Reimbursement {
 
   claimId String @unique
 
-  userId Int
+  userId   Int
   userName String
 
   department String
-  team String
+  team       String
 
   submissionDate DateTime
-  claimCategory String
+  claimCategory  String
 
   amount Float
   reason String?
 
-  status String @default("Submitted")
-  approvedAt DateTime?
+  status         String    @default("Submitted")
+  approvedAt     DateTime?
   managerRemarks String?
 
   projectId Int

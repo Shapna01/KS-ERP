@@ -6,7 +6,7 @@ export default function AccountPayableTable({
   purchaseOrders,
 }) {
     const router = useRouter();
-  return (
+    return (
     <div className="overflow-x-auto">
 
       <table className="w-full">
@@ -107,7 +107,7 @@ export default function AccountPayableTable({
 
                 </td>
 
-                <td className="px-6 py-5">
+                <td className="px-6 py-5 text-black">
 
                   ₹
                   {Number(po.totalAmount).toLocaleString(
@@ -116,7 +116,7 @@ export default function AccountPayableTable({
 
                 </td>
 
-                <td className="px-6 py-5">
+                <td className="px-6 py-5 text-black">
 
                   ₹
                   {Number(
@@ -125,7 +125,7 @@ export default function AccountPayableTable({
 
                 </td>
 
-                <td className="px-6 py-5">
+                <td className="px-6 py-5 text-black">
 
                   {po.dueDate
                     ? new Date(
